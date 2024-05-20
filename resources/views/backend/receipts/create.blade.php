@@ -119,87 +119,88 @@
 
     <script>
         $(document).ready(function() {
-            // Initialize select2 for test and package selection
-            $('.testSelect, .packageSelect').select2();
+    // Initialize select2 for test and package selection
+    $('.testSelect, .packageSelect').select2();
 
-            $('#addTest').click(function() {
-                var testName = $('#test option:selected').text();
-                var testPrice = $('#test option:selected').data('price');
-                $('#selectedItems2').append('<tr><td>' + testName + '</td>  <td>' +
-                    testPrice +
-                    'Tk </td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
-                );
-                calculateTotalPrice();
-            });
+    // Add test to the selected list
+    $('#addTest').click(function() {
+        var testName = $('#test option:selected').text();
+        var testPrice = $('#test option:selected').data('price');
+        $('#selectedItems2').append('<tr data-type="test"><td>' + testName + '</td>  <td>' +
+            testPrice + ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
+        );
+        calculateTotalPrice();
+    });
 
-            $('#addPackage').click(function() {
-                var packageName = $('#package option:selected').text();
-                var packagePrice = $('#package option:selected').data('price');
-                $('#selectedItems2').append('<tr><td>' + packageName + '</td>  <td>' +
-                    packagePrice +
-                    'Tk </td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
-                );
-                calculateTotalPrice();
-            });
+    // Add package to the selected list
+    $('#addPackage').click(function() {
+        var packageName = $('#package option:selected').text();
+        var packagePrice = $('#package option:selected').data('price');
+        $('#selectedItems2').append('<tr data-type="package"><td>' + packageName + '</td>  <td>' +
+            packagePrice + ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
+        );
+        calculateTotalPrice();
+    });
 
-            // Remove item from the list
-            $(document).on('click', '.removeItem', function() {
-                $(this).closest('tr').remove();
-                calculateTotalPrice();
-            });
+    // Remove item from the list
+    $(document).on('click', '.removeItem', function() {
+        $(this).closest('tr').remove();
+        calculateTotalPrice();
+    });
 
-            // Calculate total price
-            function calculateTotalPrice() {
-                var totalFee = 0;
-                var totalPatientDiscount = 0;
-                var totalReferenceDiscount = 0;
-                var totalDoctorCommission = 0;
-                var totalPatientPayment = 0;
+    // Calculate total price
+    function calculateTotalPrice() {
+        var totalFee = 0;
+        var totalPatientDiscount = 0;
+        var totalReferenceDiscount = 0;
+        var totalDoctorCommission = 0;
+        var totalPatientPayment = 0;
 
-                $('#selectedItems2 tr').each(function() {
-                    var fee = parseFloat($(this).find('td:eq(1)').text());
-                    totalFee += fee;
+        $('#selectedItems2 tr').each(function() {
+            var fee = parseFloat($(this).find('td:eq(1)').text());
+            totalFee += fee;
 
-                    var discount = parseFloat($(this).find('td:eq(2) input').val());
-                    var discountedFee = fee * (1 - discount / 100);
-                    var discountAmount = fee * (discount / 100);
+            var discount = parseFloat($(this).find('td:eq(2) input').val());
+            var discountedFee = fee * (1 - discount / 100);
+            var discountAmount = fee * (discount / 100);
 
-                    if ($(this).find('td:eq(0)').text().includes('Package')) {
-                        var patientDiscount = discountAmount / 2;
-                        var referenceDiscount = discountAmount / 4;
-                        var doctorCommission = discountAmount / 4;
-                        var patientPayment = fee - patientDiscount;
-                    } else {
-                        var patientDiscount = discountAmount / 3;
-                        var referenceDiscount = discountAmount / 3;
-                        var doctorCommission = discountAmount / 3;
-                        var patientPayment = fee - patientDiscount;
-                    }
-
-                    totalPatientDiscount += patientDiscount;
-                    totalReferenceDiscount += referenceDiscount;
-                    totalDoctorCommission += doctorCommission;
-                    totalPatientPayment += patientPayment;
-
-                    $(this).find('td:eq(3)').text(patientDiscount.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(4)').text(referenceDiscount.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(5)').text(doctorCommission.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(6)').text(patientPayment.toFixed(2) + ' Tk');
-                });
-
-                var totalDiscount = totalPatientDiscount + totalReferenceDiscount + totalDoctorCommission;
-                var totalPrice = totalFee - totalDiscount;
-                var totalVAT = totalPatientPayment * 0.15;
-                var finalTotalPrice = totalPatientPayment + totalVAT;
-
-                $('#totalPrice').val(finalTotalPrice.toFixed(2) + ' Tk');
+            if ($(this).data('type') === 'package') {
+                // Package discount distribution
+                var patientDiscount = discountAmount * 0.5;
+                var referenceDiscount = discountAmount * 0.25;
+                var doctorCommission = discountAmount * 0.25;
+                var patientPayment = fee - patientDiscount;
+            } else {
+                // Test discount distribution
+                var patientDiscount = discountAmount / 3;
+                var referenceDiscount = discountAmount / 3;
+                var doctorCommission = discountAmount / 3;
+                var patientPayment = fee - patientDiscount;
             }
 
-            // Recalculate total price when discount input changes
-            $(document).on('input', '.discountInput', function() {
-                calculateTotalPrice();
-            });
+            totalPatientDiscount += patientDiscount;
+            totalReferenceDiscount += referenceDiscount;
+            totalDoctorCommission += doctorCommission;
+            totalPatientPayment += patientPayment;
+
+            $(this).find('td:eq(3)').text(patientDiscount.toFixed(2) + ' Tk');
+            $(this).find('td:eq(4)').text(referenceDiscount.toFixed(2) + ' Tk');
+            $(this).find('td:eq(5)').text(doctorCommission.toFixed(2) + ' Tk');
+            $(this).find('td:eq(6)').text(patientPayment.toFixed(2) + ' Tk');
         });
+
+        var totalVAT = totalPatientPayment * 0.15;
+        var finalTotalPrice = totalPatientPayment + totalVAT;
+
+        $('#totalPrice').val(finalTotalPrice.toFixed(2) + ' Tk');
+    }
+
+    // Recalculate total price when discount input changes
+    $(document).on('input', '.discountInput', function() {
+        calculateTotalPrice();
+    });
+});
+
     </script>
 
 @endsection
