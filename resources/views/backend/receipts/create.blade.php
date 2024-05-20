@@ -89,15 +89,26 @@
                             <th>Reference Discount</th>
                             <th>Doctor Commission</th>
                             <th>Payment</th>
-                            <th width="280px">Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="selectedItems2"></tbody>
                 </table>
 
-                <div class="form-group">
-                    <label for="totalPrice">Total Price:</label>
-                    <input type="text" class="form-control" id="totalPrice" name="totalPrice" readonly>
+
+                <div class="row mt-5">
+                    <div class="form-group col-md-4">
+                        <label for="totalPrice">Total Fee:</label>
+                        <input type="text" class="form-control" id="totalPrice" name="totalPrice" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="totalVat">Total VAT (15%) :</label>
+                        <input type="text" class="form-control" id="totalVat" name="totalVat" readonly>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="finalPrice">Total Fee with VAT:</label>
+                        <input type="text" class="form-control text-success text-bold" id="finalPrice" name="finalPrice" readonly>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-success">Generate Receipt</button>
@@ -192,7 +203,9 @@
         var totalVAT = totalPatientPayment * 0.15;
         var finalTotalPrice = totalPatientPayment + totalVAT;
 
-        $('#totalPrice').val(finalTotalPrice.toFixed(2) + ' Tk');
+        $('#totalPrice').val(totalPatientPayment.toFixed(2) + ' Tk');
+        $('#totalVat').val(totalVAT.toFixed(2) + ' Tk');
+        $('#finalPrice').val(finalTotalPrice.toFixed(2) + ' Tk');
     }
 
     // Recalculate total price when discount input changes
