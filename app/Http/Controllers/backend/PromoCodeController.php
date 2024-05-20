@@ -34,10 +34,10 @@ class PromoCodeController extends Controller
                     if (!empty($row->image)) {
                         $imageUrl = $row->image;
                     } else {
-                        $imageUrl = asset('/demo_img.jpg');
+                        $imageUrl = asset('demo_img.jpg');
                     }
                     return '<a href="' . $imageUrl . '" data-lightbox="product-gallery" data-title="">
-                        <img src="' . $imageUrl . '" alt="Product Image" class="img-thumbnail" width="50" height="50">
+                        <img src="/' . $imageUrl . '" alt="Product Image" class="img-thumbnail" width="50" height="50">
                     </a>';
                 })
                 ->addColumn('start', function ($row) {

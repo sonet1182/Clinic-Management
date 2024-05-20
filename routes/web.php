@@ -6,7 +6,10 @@ use App\Http\Controllers\backend\DashboardController;
 use App\Http\Controllers\backend\ListController;
 use App\Http\Controllers\backend\MediaController;
 use App\Http\Controllers\backend\OfferController;
+use App\Http\Controllers\backend\PackageController;
 use App\Http\Controllers\backend\PromoCodeController;
+use App\Http\Controllers\backend\ReceiptController;
+use App\Http\Controllers\backend\TestController;
 use App\Http\Controllers\backend\WebSettingsController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\frontend\HomepageController;
@@ -91,6 +94,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
     //Banner
     Route::resource('banners', BannerController::class);
     Route::get('banner_list', [BannerController::class, 'list'])->name('banners.list');
+
+    //test
+    Route::resource('tests', TestController::class);
+    Route::get('test_list', [TestController::class, 'list'])->name('tests.list');
+
+    //package
+    Route::resource('packages', PackageController::class);
+    Route::get('package_list', [PackageController::class, 'list'])->name('packages.list');
+
+    //package
+    Route::resource('receipts', ReceiptController::class);
 
     //Promo Code
     Route::resource('promocodes', PromoCodeController::class);

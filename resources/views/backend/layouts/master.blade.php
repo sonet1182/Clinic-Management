@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ten Shop | @yield('title', 'Dashboard')</title>
+    <title>Rupanti | @yield('title', 'Dashboard')</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 

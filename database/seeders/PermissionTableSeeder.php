@@ -40,10 +40,16 @@ class PermissionTableSeeder extends Seeder
             // ['name' => 'category-edit', 'group_name' => 'category'],
             // ['name' => 'category-delete', 'group_name' => 'category'],
 
-            ['name' => 'promo-code-list', 'group_name' => 'promo-code'],
-            ['name' => 'promo-code-create', 'group_name' => 'promo-code'],
-            ['name' => 'promo-code-edit', 'group_name' => 'promo-code'],
-            ['name' => 'promo-code-delete', 'group_name' => 'promo-code'],
+            ['name' => 'receipt-list', 'group_name' => 'receipt'],
+            ['name' => 'receipt-create', 'group_name' => 'receipt'],
+            ['name' => 'receipt-edit', 'group_name' => 'receipt'],
+            ['name' => 'receipt-delete', 'group_name' => 'receipt'],
+
+            ['name' => 'test-list', 'group_name' => 'test'],
+            ['name' => 'test-create', 'group_name' => 'test'],
+            ['name' => 'test-edit', 'group_name' => 'test'],
+            ['name' => 'test-delete', 'group_name' => 'test'],
+
         ];
 
         foreach ($permissions as $permission) {

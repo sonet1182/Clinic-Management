@@ -46,7 +46,7 @@
 
 
 <style>
-    .file-area  label {
+    .file-area label {
         font-weight: 500;
         display: block;
         margin: 4px 0;
@@ -54,6 +54,7 @@
         font-size: 13px;
         overflow: hidden;
     }
+
     .file-area .file-dummy {
         width: 100%;
         padding: 30px;
@@ -78,15 +79,16 @@
     .file-area .file-dummy .success {
         display: none;
     }
-    .file-area input[type=file]:valid + .file-dummy .default {
+
+    .file-area input[type=file]:valid+.file-dummy .default {
         display: none;
     }
 
-    .file-area input[type=file]:valid + .file-dummy .success {
+    .file-area input[type=file]:valid+.file-dummy .success {
         display: inline-block;
     }
 
-    .file-area input[type=file]:valid + .file-dummy {
+    .file-area input[type=file]:valid+.file-dummy {
         border-color: rgba(0, 255, 0, 0.4);
         background-color: rgba(0, 255, 0, 0.3);
     }
@@ -117,7 +119,8 @@
 
     .document .document-footer {
         border-top: 1px solid #ebf1f5;
-        height: 46px;;
+        height: 46px;
+        ;
         padding: 5px 12px;
         border-radius: 0 0 2px 2px;
         position: relative;
@@ -148,12 +151,14 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
     .document .file-download {
         font-size: 32px;
         color: #fff;
         position: absolute;
         right: 10px;
     }
+
     .document.danger .document-footer {
         background-color: #b52828;
     }
@@ -189,7 +194,13 @@
         cursor: pointer;
     }
 
-    .link{
+    .link {
         cursor: pointer;
+    }
+
+    .memo-btn {
+        width: 200px;
+        height: 32px;
+        padding: 0px;
     }
 </style>
