@@ -38,8 +38,7 @@
         </li>
 
         <!-- Messages Dropdown Menu -->
-        <li class="nav-item dropdown">
-
+        {{-- <li class="nav-item dropdown">
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
             </form>
@@ -49,21 +48,20 @@
                                                  document.getElementById('logout-form').submit();">
                 {{ __('Logout') }}
             </a>
-
-       
-           
-        </li>
+        </li> --}}
     
         <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                <i class="fas fa-expand-arrows-alt"></i>
-            </a>
+
+            <div class="user-panel pr-5 d-flex">
+                <div class="image">
+                    <img src="/asset/backend/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                </div>
+                <div class="info">
+                    {{ Auth::user()->name }}
+                </div>
+            </div>
+            
         </li>
-        <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#"
-                role="button">
-                <i class="fas fa-th-large"></i>
-            </a>
-        </li>
+        
     </ul>
 </nav>

@@ -43,7 +43,7 @@
                 </li>
 
 
-                <li class="nav-header">PRODUCT MANAGEMENT</li>
+                <li class="nav-header">MANAGEMENT</li>
 
 
                 @can('banner-list')
@@ -71,8 +71,8 @@
                 @endcan
 
                 @can('receipt-list')
-                    <li class="nav-item {{ request()->is('/admin/receipts*') ? 'menu-open active' : '' }}">
-                        <a href="#" class="nav-link {{ request()->is('/admin/receipts*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->is('admin/receipts*') ? 'menu-open active' : '' }}">
+                        <a href="#" class="nav-link {{ request()->is('admin/receipts*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-table"></i>
                             <p>
                                 Receiprt
@@ -83,7 +83,7 @@
                             @can('receipt-list')
                                 <li class="nav-item">
                                     <a href="{{ route('receipts.index') }}"
-                                        class="nav-link {{ request()->is('/admin/receipts') ? 'active' : '' }}">
+                                        class="nav-link {{ request()->is('admin/receipts') ? 'active' : '' }}">
                                         <i class="fa fa-list nav-icon"></i>
                                         <p>receipt List</p>
                                     </a>
@@ -92,7 +92,7 @@
                             @can('receipt-create')
                                 <li class="nav-item">
                                     <a href="{{ route('receipts.create') }}"
-                                        class="nav-link {{ request()->is('/admin/receipts/create') ? 'active' : '' }}">
+                                        class="nav-link {{ request()->is('admin/receipts/create') ? 'active' : '' }}">
                                         <i class="fa fa-plus nav-icon"></i>
                                         <p>Create New</p>
                                     </a>
@@ -104,17 +104,7 @@
 
 
 
-                {{-- <li class="nav-item">
-                    <a href="{{ route('dashboard.v1') }}" class="nav-link {{ request()->is('admin/dashboard/v1*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Widgets
-                            <span class="right badge badge-danger">New</span>
-                        </p>
-                    </a>
-                </li> --}}
-
-                <li class="nav-header">PRODUCT MANAGEMENT</li>
+                {{-- <li class="nav-header">PRODUCT MANAGEMENT</li>
 
                 @can('banner-list')
                     <li class="nav-item {{ request()->is('admin/banners*') ? 'menu-open active' : '' }}">
@@ -383,13 +373,13 @@
                             @endcan
                         </ul>
                     </li>
-                @endcan
+                @endcan --}}
 
 
 
                 <li class="nav-header">WEB SETTINGS</li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('media_index') }}"
                         class="nav-link {{ request()->is('admin/media*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-image"></i>
@@ -402,7 +392,7 @@
                         <i class="nav-icon fas fa-cog"></i>
                         <p>Properties</p>
                     </a>
-                </li>
+                </li> --}}
 
                 @can('role-list')
                     <li class="nav-item {{ request()->is('admin/roles*') ? 'menu-open active' : '' }}">
@@ -467,6 +457,20 @@
                         </ul>
                     </li>
                 @endcan
+
+                <li class="nav-item">
+                    <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();"
+                        class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <p>Log Out</p>
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
+
             </ul>
         </nav>
 

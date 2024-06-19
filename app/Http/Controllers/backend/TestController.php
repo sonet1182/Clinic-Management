@@ -9,13 +9,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class TestController extends Controller
 {
-    // function __construct()
-    // {
-    //      $this->middleware('permission:banner-list|banner-create|banner-edit|banner-delete', ['only' => ['index','store']]);
-    //      $this->middleware('permission:banner-create', ['only' => ['create','store']]);
-    //      $this->middleware('permission:banner-edit', ['only' => ['edit','update']]);
-    //      $this->middleware('permission:banner-delete', ['only' => ['destroy']]);
-    // }
+    function __construct()
+    {
+         $this->middleware('permission:test-list|test-create|test-edit|test-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:test-create', ['only' => ['create','store']]);
+         $this->middleware('permission:test-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:test-delete', ['only' => ['destroy']]);
+    }
 
 
     public function index()

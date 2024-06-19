@@ -39,7 +39,6 @@ Route::get('students/list', [StudentController::class, 'getStudents'])->name('st
 // Yajra Data Table End
 
 
-//Sent SMS Start
 // Send SMS by HTTP
 Route::get('/sms', [HomeController::class, "sms"]);
 // Send SMS by PHP Script
@@ -62,8 +61,6 @@ Auth::routes();
 //Zone Ajax
 Route::get('/district-list', [ZoneController::class, "districts"]);
 Route::get('/thana-list', [ZoneController::class, "thanas"]);
-
-
 
 
 
@@ -105,6 +102,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
 
     //package
     Route::resource('receipts', ReceiptController::class);
+    Route::get('receipt_list', [ReceiptController::class, 'list'])->name('receipt.list');
+
 
     //Promo Code
     Route::resource('promocodes', PromoCodeController::class);

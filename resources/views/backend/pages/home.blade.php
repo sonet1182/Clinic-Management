@@ -1,609 +1,356 @@
 @extends('backend.layouts.master')
 
 @section('content')
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Istok+Web:400,700);
+        @import url(https://fonts.googleapis.com/css?family=Lato:300,400,700,900);
 
+        html,
+        body {
+            background: teal;
+        }
 
+        .calendar {
+            font-family: "Istok Web", sans-serif;
+            width: 200px;
+            height: 200px;
+            margin: 60px auto;
+            background: white;
+            box-shadow: 0px 5px 5px #222, -5px 7px 0px 3px #726a57, -12px 13px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            border-radius: 1px;
+            /* -moz-transform: rotate(-20deg);
+                    -ms-transform: rotate(-20deg);
+                    -webkit-transform: rotate(-20deg);
+                    transform: rotate(-20deg); */
+        }
 
-            <!-- Small boxes (Stat box) -->
+        .calendar:before {
+            content: '';
+            position: absolute;
+            border-left: 200px solid transparent;
+            border-bottom: 30px solid rgba(0, 0, 0, 0.1);
+            bottom: 0px;
+        }
+
+        .month {
+            width: 100%;
+            background: linear-gradient(to right, #a32929, #ff6666 75%);
+            background: -webkit-linear-gradient(left, #a32929, #ff6666 75%);
+            background: -moz-linear-gradient(left, #a32929, #ff6666 75%);
+            height: 40px;
+            color: white;
+            box-shadow: 0px 5px 5px #ddd;
+            position: relative;
+        }
+
+        .month:before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            left: 60px;
+            top: 5px;
+            border-radius: 50%;
+            background: #4d0000;
+            box-shadow: 60px 0px 0px #4d0000;
+        }
+
+        .month:after {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 20px;
+            background: #555;
+            border-radius: 20% 20% 0 0;
+            left: 62px;
+            top: -12px;
+            box-shadow: 0px -2px 0px #777, -1px 0px 2px #777, 0px 3px 0px #4d0000, 60px 0px 0px #555, 60px -2px 0px #777;
+        }
+
+        .month .month-name {
+            padding-left: 10px;
+            font-size: 20px;
+            letter-spacing: 2px;
+            position: absolute;
+            bottom: 0;
+            text-transform: uppercase;
+        }
+
+        .number {
+            text-align: center;
+            margin-top: -25px;
+            font-size: 150px;
+            color: #2d2d2d;
+            font-weight: 700;
+        }
+
+        .two {
+            width: 150px;
+            height: 150px;
+            background: #222;
+            margin: 100px auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .caltwo {
+            width: 200px;
+            margin: 100px auto 0 auto;
+            background: #222;
+            text-align: center;
+            color: #eaeaea;
+            position: relative;
+            font-family: "Lato", sans-serif;
+            text-transform: uppercase;
+            padding: 10px 0;
+            box-shadow: 2px 5px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .daytwo {
+            font-size: 25px;
+            letter-spacing: 7px;
+            font-weight: 300;
+            margin-bottom: -2px;
+        }
+
+        .monthtwo {
+            font-size: 16px;
+            font-weight: 400;
+            color: #cc0000;
+            letter-spacing: 5px;
+            word-spacing: 5px;
+        }
+
+        .clock {
+            width: 150px;
+            height: 30px;
+            background: #eaeaea;
+            margin: 0 auto;
+            line-height: 30px;
+            text-align: center;
+            box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .time {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            margin-right: -4px;
+            font-family: "Lato", sans-serif;
+            font-weight: 300;
+            color: #666;
+            letter-spacing: 5px;
+        }
+
+        .meter {
+            width: 300px;
+            position: relative;
+            margin: 80px auto;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .meter:before {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 10px;
+            left: 150px;
+            top: 0px;
+            background: #aaa;
+        }
+
+        .meter:after {
+            content: "Visual Clock";
+            position: absolute;
+            top: -20px;
+            font-family: "Lato", sans-serif;
+            font-weight: 300;
+            text-transform: uppercase;
+            opacity: 0.3;
+            font-size: 12px;
+            letter-spacing: 5px;
+            color: white;
+        }
+
+        .timer {
+            margin: 5px 0;
+        }
+
+        .hours {
+            height: 10px;
+            background: #222;
+            border-bottom: 1px solid #333;
+        }
+
+        .minutes {
+            height: 5px;
+            width: 1px;
+            background: #eaeaea;
+            border-bottom: 1px solid #333;
+        }
+
+        .minutes:before {
+            position: absolute;
+            content: '';
+            left: 150px;
+            width: 1px;
+            height: 5px;
+            background: #333;
+        }
+
+        .seconds {
+            height: 2px;
+            width: 1px;
+            background: #990000;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-md-8">
+
             <div class="row">
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
+                <div class="col-lg-4 col-md-6">
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3>150</h3>
-
-                            <p>New Orders</p>
+                            <h3>{{ $test }}</h3>
+                            <p>Total Tests</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-bag"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="{{ route('tests.index') }}" class="small-box-footer">Go to <i
+                                class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
+
+                <div class="col-lg-4 col-md-6">
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>53<sup style="font-size: 20px">%</sup></h3>
-
-                            <p>Bounce Rate</p>
+                            <h3>{{ $package }}</h3>
+                            <p>Total Package</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-stats-bars"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="{{ route('packages.index') }}" class="small-box-footer">Go to <i
+                                class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
+
+                <div class="col-lg-4 col-md-6">
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>44</h3>
+                            <h3>{{ $receipt }}</h3>
 
-                            <p>User Registrations</p>
+                            <p>Total Receipt</p>
                         </div>
                         <div class="icon">
                             <i class="ion ion-person-add"></i>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a href="{{ route('receipts.index') }}" class="small-box-footer">Go to <i
+                                class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                <!-- ./col -->
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-danger">
-                        <div class="inner">
-                            <h3>65</h3>
 
-                            <p>Unique Visitors</p>
+                <div class="col-lg-4 col-md-6">
+                    <div class="animate__animated animate bounce card">
+                        <div class="container mt-3 text-center">
+                            <img src="{{ asset('images/receipt.png') }}" class=" " alt="..." height="100px" width="100px">
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-pie-graph"></i>
+                        <div class="card-body">
+                            <a href="{{ route('receipts.create') }}"
+                                class="btn btn-outline-danger mb-1 mt-1 w-100"> <i class="fa fa-plus"></i> Generate Receipt</a>
                         </div>
-                        <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
+
                 </div>
-                <!-- ./col -->
+
+
             </div>
-            <!-- /.row -->
-            <!-- Main row -->
-            <div class="row">
-                <!-- Left col -->
-                <section class="col-lg-7 connectedSortable">
-                    <!-- Custom tabs (Charts with tabs)-->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-chart-pie mr-1"></i>
-                                Sales
-                            </h3>
-                            <div class="card-tools">
-                                <ul class="nav nav-pills ml-auto">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#revenue-chart" data-toggle="tab">Area</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#sales-chart" data-toggle="tab">Donut</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div><!-- /.card-header -->
-                        <div class="card-body">
-                            <div class="tab-content p-0">
-                                <!-- Morris chart - Sales -->
-                                <div class="chart tab-pane active" id="revenue-chart"
-                                    style="position: relative; height: 300px;">
-                                    <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
-                                </div>
-                                <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                                    <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
-                                </div>
-                            </div>
-                        </div><!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
 
-                    <!-- DIRECT CHAT -->
-                    <div class="card direct-chat direct-chat-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Direct Chat</h3>
+        </div>
 
-                            <div class="card-tools">
-                                <span title="3 New Messages" class="badge badge-primary">3</span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-                                    <i class="fas fa-comments"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body">
-                            <!-- Conversations are loaded here -->
-                            <div class="direct-chat-messages">
-                                <!-- Message. Default to the left -->
-                                <div class="direct-chat-msg">
-                                    <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-left">Alexander Pierce</span>
-                                        <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-                                    </div>
-                                    <!-- /.direct-chat-infos -->
-                                    <img class="direct-chat-img" src="/asset/backend/dist/img/user1-128x128.jpg"
-                                        alt="message user image">
-                                    <!-- /.direct-chat-img -->
-                                    <div class="direct-chat-text">
-                                        Is this template really for free? That's unbelievable!
-                                    </div>
-                                    <!-- /.direct-chat-text -->
-                                </div>
-                                <!-- /.direct-chat-msg -->
-
-                                <!-- Message to the right -->
-                                <div class="direct-chat-msg right">
-                                    <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-right">Sarah Bullock</span>
-                                        <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-                                    </div>
-                                    <!-- /.direct-chat-infos -->
-                                    <img class="direct-chat-img" src="/asset/backend/dist/img/user3-128x128.jpg"
-                                        alt="message user image">
-                                    <!-- /.direct-chat-img -->
-                                    <div class="direct-chat-text">
-                                        You better believe it!
-                                    </div>
-                                    <!-- /.direct-chat-text -->
-                                </div>
-                                <!-- /.direct-chat-msg -->
-
-                                <!-- Message. Default to the left -->
-                                <div class="direct-chat-msg">
-                                    <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-left">Alexander Pierce</span>
-                                        <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
-                                    </div>
-                                    <!-- /.direct-chat-infos -->
-                                    <img class="direct-chat-img" src="/asset/backend/dist/img/user1-128x128.jpg"
-                                        alt="message user image">
-                                    <!-- /.direct-chat-img -->
-                                    <div class="direct-chat-text">
-                                        Working with AdminLTE on a great new app! Wanna join?
-                                    </div>
-                                    <!-- /.direct-chat-text -->
-                                </div>
-                                <!-- /.direct-chat-msg -->
-
-                                <!-- Message to the right -->
-                                <div class="direct-chat-msg right">
-                                    <div class="direct-chat-infos clearfix">
-                                        <span class="direct-chat-name float-right">Sarah Bullock</span>
-                                        <span class="direct-chat-timestamp float-left">23 Jan 6:10 pm</span>
-                                    </div>
-                                    <!-- /.direct-chat-infos -->
-                                    <img class="direct-chat-img" src="/asset/backend/dist/img/user3-128x128.jpg"
-                                        alt="message user image">
-                                    <!-- /.direct-chat-img -->
-                                    <div class="direct-chat-text">
-                                        I would love to.
-                                    </div>
-                                    <!-- /.direct-chat-text -->
-                                </div>
-                                <!-- /.direct-chat-msg -->
-
-                            </div>
-                            <!--/.direct-chat-messages-->
-
-                            <!-- Contacts are loaded here -->
-                            <div class="direct-chat-contacts">
-                                <ul class="contacts-list">
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user1-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    Count Dracula
-                                                    <small class="contacts-list-date float-right">2/28/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">How have you been? I
-                                                    was...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user7-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    Sarah Doe
-                                                    <small class="contacts-list-date float-right">2/23/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">I will be waiting for...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user3-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    Nadia Jolie
-                                                    <small class="contacts-list-date float-right">2/20/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">I'll call you back at...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user5-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    Nora S. Vans
-                                                    <small class="contacts-list-date float-right">2/10/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">Where is your new...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user6-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    John K.
-                                                    <small class="contacts-list-date float-right">1/27/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">Can I take a look at...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                    <li>
-                                        <a href="#">
-                                            <img class="contacts-list-img" src="/asset/backend/dist/img/user8-128x128.jpg"
-                                                alt="User Avatar">
-
-                                            <div class="contacts-list-info">
-                                                <span class="contacts-list-name">
-                                                    Kenneth M.
-                                                    <small class="contacts-list-date float-right">1/4/2015</small>
-                                                </span>
-                                                <span class="contacts-list-msg">Never mind I found...</span>
-                                            </div>
-                                            <!-- /.contacts-list-info -->
-                                        </a>
-                                    </li>
-                                    <!-- End Contact Item -->
-                                </ul>
-                                <!-- /.contacts-list -->
-                            </div>
-                            <!-- /.direct-chat-pane -->
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="card-footer">
-                            <form action="#" method="post">
-                                <div class="input-group">
-                                    <input type="text" name="message" placeholder="Type Message ..."
-                                        class="form-control">
-                                    <span class="input-group-append">
-                                        <button type="button" class="btn btn-primary">Send</button>
-                                    </span>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- /.card-footer-->
-                    </div>
-                    <!--/.direct-chat -->
-
-                    <!-- TO DO List -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="ion ion-clipboard mr-1"></i>
-                                To Do List
-                            </h3>
-
-                            <div class="card-tools">
-                                <ul class="pagination pagination-sm">
-                                    <li class="page-item"><a href="#" class="page-link">&laquo;</a>
-                                    </li>
-                                    <li class="page-item"><a href="#" class="page-link">1</a></li>
-                                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                                    <li class="page-item"><a href="#" class="page-link">3</a></li>
-                                    <li class="page-item"><a href="#" class="page-link">&raquo;</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body">
-                            <ul class="todo-list" data-widget="todo-list">
-                                <li>
-                                    <!-- drag handle -->
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <!-- checkbox -->
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo1" id="todoCheck1">
-                                        <label for="todoCheck1"></label>
-                                    </div>
-                                    <!-- todo text -->
-                                    <span class="text">Design a nice theme</span>
-                                    <!-- Emphasis label -->
-                                    <small class="badge badge-danger"><i class="far fa-clock"></i> 2
-                                        mins</small>
-                                    <!-- General tools such as edit or delete-->
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo2" id="todoCheck2" checked>
-                                        <label for="todoCheck2"></label>
-                                    </div>
-                                    <span class="text">Make the theme responsive</span>
-                                    <small class="badge badge-info"><i class="far fa-clock"></i> 4
-                                        hours</small>
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo3" id="todoCheck3">
-                                        <label for="todoCheck3"></label>
-                                    </div>
-                                    <span class="text">Let theme shine like a star</span>
-                                    <small class="badge badge-warning"><i class="far fa-clock"></i> 1
-                                        day</small>
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo4" id="todoCheck4">
-                                        <label for="todoCheck4"></label>
-                                    </div>
-                                    <span class="text">Let theme shine like a star</span>
-                                    <small class="badge badge-success"><i class="far fa-clock"></i> 3
-                                        days</small>
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo5" id="todoCheck5">
-                                        <label for="todoCheck5"></label>
-                                    </div>
-                                    <span class="text">Check your messages and notifications</span>
-                                    <small class="badge badge-primary"><i class="far fa-clock"></i> 1
-                                        week</small>
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="handle">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </span>
-                                    <div class="icheck-primary d-inline ml-2">
-                                        <input type="checkbox" value="" name="todo6" id="todoCheck6">
-                                        <label for="todoCheck6"></label>
-                                    </div>
-                                    <span class="text">Let theme shine like a star</span>
-                                    <small class="badge badge-secondary"><i class="far fa-clock"></i> 1
-                                        month</small>
-                                    <div class="tools">
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash-o"></i>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="card-footer clearfix">
-                            <button type="button" class="btn btn-primary float-right"><i class="fas fa-plus"></i> Add
-                                item</button>
-                        </div>
-                    </div>
-                    <!-- /.card -->
-                </section>
-                <!-- /.Left col -->
-                <!-- right col (We are only adding the ID to make the widgets sortable)-->
-                <section class="col-lg-5 connectedSortable">
-
-                    <!-- Map card -->
-                    <div class="card bg-gradient-primary">
-                        <div class="card-header border-0">
-                            <h3 class="card-title">
-                                <i class="fas fa-map-marker-alt mr-1"></i>
-                                Visitors
-                            </h3>
-                            <!-- card tools -->
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-primary btn-sm daterange" title="Date range">
-                                    <i class="far fa-calendar-alt"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" data-card-widget="collapse"
-                                    title="Collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                            <!-- /.card-tools -->
-                        </div>
-                        <div class="card-body">
-                            <div id="world-map" style="height: 250px; width: 100%;"></div>
-                        </div>
-                        <!-- /.card-body-->
-                        <div class="card-footer bg-transparent">
-                            <div class="row">
-                                <div class="col-4 text-center">
-                                    <div id="sparkline-1"></div>
-                                    <div class="text-white">Visitors</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <div id="sparkline-2"></div>
-                                    <div class="text-white">Online</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <div id="sparkline-3"></div>
-                                    <div class="text-white">Sales</div>
-                                </div>
-                                <!-- ./col -->
-                            </div>
-                            <!-- /.row -->
-                        </div>
-                    </div>
-                    <!-- /.card -->
-
-                    <!-- solid sales graph -->
-                    <div class="card bg-gradient-info">
-                        <div class="card-header border-0">
-                            <h3 class="card-title">
-                                <i class="fas fa-th mr-1"></i>
-                                Sales Graph
-                            </h3>
-
-                            <div class="card-tools">
-                                <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <canvas class="chart" id="line-chart"
-                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="card-footer bg-transparent">
-                            <div class="row">
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="20"
-                                        data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">Mail-Orders</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="50"
-                                        data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">Online</div>
-                                </div>
-                                <!-- ./col -->
-                                <div class="col-4 text-center">
-                                    <input type="text" class="knob" data-readonly="true" value="30"
-                                        data-width="60" data-height="60" data-fgColor="#39CCCC">
-
-                                    <div class="text-white">In-Store</div>
-                                </div>
-                                <!-- ./col -->
-                            </div>
-                            <!-- /.row -->
-                        </div>
-                        <!-- /.card-footer -->
-                    </div>
-                    <!-- /.card -->
-
-                    <!-- Calendar -->
-                    <div class="card bg-gradient-success">
-                        <div class="card-header border-0">
-
-                            <h3 class="card-title">
-                                <i class="far fa-calendar-alt"></i>
-                                Calendar
-                            </h3>
-                            <!-- tools card -->
-                            <div class="card-tools">
-                                <!-- button with a dropdown -->
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-success btn-sm dropdown-toggle"
-                                        data-toggle="dropdown" data-offset="-52">
-                                        <i class="fas fa-bars"></i>
-                                    </button>
-                                    <div class="dropdown-menu" role="menu">
-                                        <a href="#" class="dropdown-item">Add new event</a>
-                                        <a href="#" class="dropdown-item">Clear events</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a href="#" class="dropdown-item">View calendar</a>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <!-- /. tools -->
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body pt-0">
-                            <!--The calendar -->
-                            <div id="calendar" style="width: 100%"></div>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
-                </section>
-                <!-- right col -->
+        <div class="col-md-4">
+            <div class='calendar'>
+                <div class='day'></div>
+                <div class='month'>
+                    <div class='month-name'></div>
+                </div>
+                <div class='number'></div>
             </div>
-            <!-- /.row (main row) -->
+            <div class='contain'>
+                <div class='caltwo'>
+                    <div class='daytwo'></div>
+                    <div class='monthtwo'></div>
+                    <div class='numtwo'></div>
+                </div>
+                <div class='clock'>
+                    <div class='hour time'></div>
+                    <div class='min time'></div>
+                    <div class='sec time'></div>
+                </div>
+            </div>
+            {{-- <div class='meter'>
+                <div class='hours timer'></div>
+                <div class='minutes timer'></div>
+                <div class='seconds timer'></div>
+            </div> --}}
+        </div>
+    </div>
+@endsection
 
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            var weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            var months = ["January", "Februray", "March", "April", "May", "June", "July", "August", "September",
+                "October", "November", "December"
+            ];
+            setInterval(function() {
+                var d = new Date();
+                var day = d.getDay();
+                var day_name = weekdays[day];
+                var num = d.getDate();
+                var mo = d.getMonth();
+                var name = months[mo];
+                $(".month-name").html(name.substring(0, 3));
+                $(".number").html(num);
+                //$(".day").html(day_name);
+                $(".monthtwo").html(name + " " + num);
+                $(".daytwo").html(day_name);
+                var minute = d.getMinutes();
+                var hour = d.getHours();
+                var sec = d.getSeconds();
+                var secMinMeter = 300 / 60;
+                $(".hours").css("width", hour * 12.5 + "px");
+                if (hour < 10) {
+                    $(".hour").html("0" + hour + ":")
+                } else if (hour > 12) {
+                    hour = hour - 12;
+                    if (hour < 10) {
+                        $(".hour").html("0" + hour + ":");
+                    }
+                } else {
+                    $(".hour").html(hour + ":");
+                }
+                if (minute < 10) {
+                    $(".min").html("0" + minute + ":");
+                    $(".minutes").css("width", minute * 5 + "px");
+                } else {
+                    $(".min").html(minute + ":");
+                    $(".minutes").css("width", minute * 5 + "px");
+                }
+                if (sec < 10) {
+                    $(".sec").html("0" + sec);
+                    $(".seconds").css("width", sec * 5 + "px");
+                } else {
+                    $(".sec").html(sec);
+                    $(".seconds").css("width", sec * 5 + "px");
+                }
+            }, 1000)
+        })
+    </script>
 @endsection

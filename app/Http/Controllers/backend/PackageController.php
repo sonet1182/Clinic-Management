@@ -11,13 +11,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PackageController extends Controller
 {
-    // function __construct()
-    // {
-    //      $this->middleware('permission:banner-list|banner-create|banner-edit|banner-delete', ['only' => ['index','store']]);
-    //      $this->middleware('permission:banner-create', ['only' => ['create','store']]);
-    //      $this->middleware('permission:banner-edit', ['only' => ['edit','update']]);
-    //      $this->middleware('permission:banner-delete', ['only' => ['destroy']]);
-    // }
+    function __construct()
+    {
+         $this->middleware('permission:package-list|package-create|package-edit|package-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:package-create', ['only' => ['create','store']]);
+         $this->middleware('permission:package-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:package-delete', ['only' => ['destroy']]);
+    }
 
 
     public function index()
@@ -116,11 +116,23 @@ class PackageController extends Controller
         $data = Package::find($id);
 
         if (!$data) {
-            return response()->json(['success' => false, 'message' => 'Record not found'], 404);
+
+            $notification = [
+                'alert-type' => 'error',
+                'message' => 'Record not dound!',
+            ];
+    
+            return redirect()->back()->with($notification);
         }
 
         $data->delete();
 
-        return response()->json(['success' => true, 'message' => 'Record deleted successfully']);
+
+        $notification = [
+            'alert-type' => 'success',
+            'message' => 'Record has been Deleted!',
+        ];
+
+        return redirect()->back()->with($notification);
     }
 }

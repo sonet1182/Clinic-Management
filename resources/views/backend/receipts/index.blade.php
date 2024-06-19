@@ -1,76 +1,169 @@
 @extends('backend.layouts.master')
 
-@section('title', 'Package Management')
+@section('title', 'Receipts')
+@section('breadcrumb', 'Receipts List')
 
 @section('content')
 
     <div class="card card-default">
+        @if ($errors->any())
+            <div class="alert alert-danger mb-2">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="card-header">
             <div class="d-flex">
-                <a class="btn btn-success ml-auto" href="{{ route('packages.create') }}">
-                    <i class="nav-icon fas fa-plus"></i> Create New Package
-                </a>
+                <div class="ml-auto">
+                    <a type="button" class="btn btn-sm btn-success" href="{{ route('receipts.create') }}">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Create New Receipt
+                    </a>
+                </div>
             </div>
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered" id="example1" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Fee</th>
-                        <th>Tests</th>
-                        <th width="280px">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($packages as $package)
+            <div class="mb-5" style="width: 360px">
+                <label>Filter By Date and Time Range:</label>
+                <div class="input-group" id="rangeInputGroup">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="far fa-clock"></i></span>
+                    </div>
+                    <input type="text" name="range" class="form-control float-right" id="reservationtime"
+                        value="">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered yajra-datatable">
+                    <thead>
                         <tr>
-                            <td>{{ $package->id }}</td>
-                            <td>{{ $package->name }}</td>
-                            <td>{{ number_format($package->price) }} Tk</td>
-                            <td>
-                                @foreach ($package->test_names as $testName)
-                                    <span class="badge badge-sm badge-success">{{ $testName }}</span>
-                                @endforeach
-                            </td>
-                            <td>
-                                @can('package-edit')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('packages.edit', $package->id) }}">Edit</a>
-                                @endcan
-                                @can('package-delete')
-                                    <form method="POST" action="{{ route('packages.destroy', $package->id) }}"
-                                        style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-xs btn-danger">Delete</button>
-                                    </form>
-                                @endcan
-                            </td>
+                            <th>Id</th>
+                            <th>Patient Name</th>
+                            <th>Patient Age</th>
+                            <th>Patient Address</th>
+                            <th>Total Price</th>
+                            <th>Total VAT</th>
+                            <th>Final Price</th>
+                            <th>Generated At</th>
+                            <th>Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-          
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
 @endsection
 
 @section('scripts')
+    <script type="text/javascript">
+        var table;
 
-<script>
-    $(function() {
-        $("#example1").DataTable({
-            "responsive": true,
-            "lengthChange": false,
-            "autoWidth": false,
-            "order": [[0, "desc"]] // Order by the first column in descending order
+        $(document).ready(function() {
+            $('#reservationtime').daterangepicker({
+                timePicker: true,
+                timePicker24Hour: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+
+            $('#reservationtime').on('apply.daterangepicker', function(ev, picker) {
+                table.draw();
+            });
+
+            table = $('.yajra-datatable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('receipt.list') }}",
+                    type: 'GET',
+                    data: function(d) {
+                        var dateRange = $('#reservationtime').val();
+                        if (dateRange) {
+                            d.date_range = dateRange;
+                        }
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr(
+                            'content'));
+                    },
+                },
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'patient_name',
+                        name: 'patient_name'
+                    },
+                    {
+                        data: 'patient_age',
+                        name: 'patient_age'
+                    },
+                    {
+                        data: 'patient_address',
+                        name: 'patient_address'
+                    },
+                    {
+                        data: 'total_price',
+                        name: 'total_price'
+                    },
+                    {
+                        data: 'total_vat',
+                        name: 'total_vat'
+                    },
+                    {
+                        data: 'final_price',
+                        name: 'final_price'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+
+            // Handle delete button click event
+            $('.yajra-datatable').on('click', '.delete-btn', function() {
+                var rowId = $(this).data('row-id');
+
+                if (confirm('Are you sure you want to delete this record?')) {
+                    $.ajax({
+                        url: '/admin/receipts/' + rowId,
+                        type: 'DELETE',
+                        data: {
+                            '_token': '{{ csrf_token() }}',
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                            table.ajax.reload();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                            alert('Error deleting record');
+                        }
+                    });
+                }
+            });
         });
-    });
-</script>
-
+    </script>
 @endsection

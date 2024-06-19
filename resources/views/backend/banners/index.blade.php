@@ -186,7 +186,7 @@
 
                 if (confirm('Are you sure you want to delete this record?')) {
                     $.ajax({
-                        url: '/banners/' + rowId,
+                        url: '/admin/banners/' + rowId,
                         type: 'DELETE',
                         data: {
                             '_token': '{{ csrf_token() }}',
