@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 card">
+        <div class="col-md-3 card">
             <div class="card-body">
                 <h3 class="text-center">Test/Package</h3>
                 <form id="memoForm" method="POST" action="{{ route('receipts.store') }}">
@@ -46,12 +46,14 @@
                         <div class="d-flex">
                             <select id="test" class="form-control testSelect">
                                 @foreach ($tests as $test)
-                                    <option value="{{ $test->id }}" data-id="{{ $test->id }}" data-price="{{ $test->price }}">{{ $test->name }}
+                                    <option value="{{ $test->id }}" data-id="{{ $test->id }}"
+                                        data-price="{{ $test->price }}">{{ $test->name }}
                                         ({{ number_format($test->price) }} Tk)
                                     </option>
                                 @endforeach
                             </select>
-                            <button type="button" class="btn btn-primary memo-btn" id="addTest">Add Test</button>
+                            <button type="button" style="width: 120px" class="btn btn-primary memo-btn" id="addTest">Add
+                                Test</button>
                         </div>
                     </div>
 
@@ -61,18 +63,29 @@
 
                             <select id="package" class="form-control packageSelect">
                                 @foreach ($packages as $package)
-                                    <option value="{{ $package->id }}" data-id="{{ $package->id }}" data-price="{{ $package->price }}">{{ $package->name }} ({{ number_format($package->price) }} Tk)</option>
+                                    <option value="{{ $package->id }}" data-id="{{ $package->id }}"
+                                        data-price="{{ $package->price }}">{{ $package->name }}
+                                        ({{ number_format($package->price) }} Tk)
+                                    </option>
                                 @endforeach
                             </select>
 
-                            <button type="button" class="btn btn-primary memo-btn" id="addPackage">Add Package</button>
+                            <button type="button" style="width: 120px" class="btn btn-primary memo-btn" id="addPackage">Add
+                                Package</button>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="promoCode">Promo Code:</label>
+                        <input type="text" class="form-control" id="promoCode" name="promoCode">
+                        <button type="button" class="btn btn-primary mt-2" id="applyPromoCode">Apply</button>
+                    </div>
+
                 </form>
             </div>
         </div>
 
-        <div class="col-md-8 card">
+        <div class="col-md-9 card">
             <div class="card-body">
                 <h3 class="text-center">Memo</h3>
 
@@ -95,15 +108,19 @@
                 </div>
 
                 <div class="row mt-5">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="totalPrice">Total Fee:</label>
                         <input type="number" class="form-control" id="totalPrice" name="totalPrice" readonly>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="totalVat">Total VAT (15%) :</label>
                         <input type="number" class="form-control" id="totalVat" name="totalVat" readonly>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
+                        <label for="couponDiscount">Coupon Discount :</label>
+                        <input type="number" class="form-control" id="couponDiscount" name="couponDiscount" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="finalPrice">Total Fee with VAT:</label>
                         <input type="number" class="form-control text-success text-bold" id="finalPrice" name="finalPrice"
                             readonly>
@@ -111,6 +128,33 @@
                 </div>
 
                 <button type="button" class="btn btn-success" id="generateReceipt">Generate Receipt</button>
+
+
+                <form id="pdfForm" method="POST" action="{{ route('generate.pdf') }}">
+                    @csrf
+                    <input type="hidden" name="pdf_patientName" id="pdf_patientName" value="">
+                    <input type="hidden" name="pdf_patientAge" id="pdf_patientAge" value="">
+                    <input type="hidden" name="pdf_patientAddress" id="pdf_patientAddress" value="">
+                    <input type="hidden" name="pdf_totalPrice" id="pdf_totalPrice" value="">
+                    <input type="hidden" name="pdf_totalVat" id="pdf_totalVat" value="">
+                    <input type="hidden" name="pdf_finalPrice" id="pdf_finalPrice" value="">
+                    <input type="hidden" name="pdf_items" id="pdf_items" value="">
+                    <input type="hidden" name="pdf_couponDiscount" id="pdf_couponDiscount" value="">
+
+
+
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-primary" id="pdfReceipt">
+                                <i class="fa fa-print"></i> PDF Receipt Download
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+
+
+
             </div>
         </div>
     </div>
@@ -122,7 +166,6 @@
             // Initialize select2 for test and package selection
             $('.testSelect, .packageSelect').select2();
 
-            // Add test to the selected list
             // Add test to the selected list
             $('#addTest').click(function() {
                 var testName = $('#test option:selected').text();
@@ -159,6 +202,48 @@
                 calculateTotalPrice();
             });
 
+
+            $('#applyPromoCode').click(function() {
+                var promoCode = $('#promoCode').val();
+
+                $.ajax({
+                    url: '{{ route('validate.promo.code') }}',
+                    method: 'POST',
+                    data: {
+                        promoCode: promoCode
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            applyPromoCodeDiscount(response.promoCode);
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('Error validating promo code');
+                    }
+                });
+            });
+
+            function applyPromoCodeDiscount(promoCode) {
+                var discountAmount = 0;
+                var totalFeeWithVAT = parseFloat($('#finalPrice').val());
+
+                if (promoCode.type == 1) {
+                    discountAmount = totalFeeWithVAT * (promoCode.amount / 100);
+                } else if (promoCode.type == 2) {
+                    discountAmount = promoCode.amount;
+                }
+
+                var finalPriceAfterDiscount = totalFeeWithVAT - discountAmount;
+
+                $('#finalPrice').val(finalPriceAfterDiscount.toFixed(2));
+                $('#couponDiscount').val(discountAmount.toFixed(2));
+                $('#pdf_couponDiscount').val(discountAmount.toFixed(2));
+            }
+
+
+
             // Calculate total price
             function calculateTotalPrice() {
                 var totalFee = 0;
@@ -171,23 +256,23 @@
                     var fee = parseFloat($(this).find('td:eq(1)').text());
                     totalFee += fee;
 
-                    var discount = parseFloat($(this).find('td:eq(2) input').val());
-                    var discountedFee = fee * (1 - discount / 100);
-                    var discountAmount = fee * (discount / 100);
+                    var discountPercentage = parseFloat($(this).find('td:eq(2) input').val());
+                    var discountAmount = fee * (discountPercentage / 100);
+                    var discountedFee = fee - discountAmount;
 
                     if ($(this).data('type') === 'package') {
                         // Package discount distribution
                         var patientDiscount = discountAmount * 0.5;
                         var referenceDiscount = discountAmount * 0.25;
                         var doctorCommission = discountAmount * 0.25;
-                        var patientPayment = fee - patientDiscount;
                     } else {
                         // Test discount distribution
                         var patientDiscount = discountAmount / 3;
                         var referenceDiscount = discountAmount / 3;
                         var doctorCommission = discountAmount / 3;
-                        var patientPayment = fee - patientDiscount;
                     }
+
+                    var patientPayment = discountedFee;
 
                     totalPatientDiscount += patientDiscount;
                     totalReferenceDiscount += referenceDiscount;
@@ -206,6 +291,14 @@
                 $('#totalPrice').val(totalPatientPayment.toFixed(2));
                 $('#totalVat').val(totalVAT.toFixed(2));
                 $('#finalPrice').val(finalTotalPrice.toFixed(2));
+
+                // var totalFeeWithVAT = totalPatientPayment + totalVAT;
+                // $('#finalPrice').val(totalFeeWithVAT.toFixed(2));
+
+                var promoCode = $('#promoCode').val();
+                if (promoCode) {
+                    $('#applyPromoCode').click();
+                }
             }
 
             // Recalculate total price when discount input changes
@@ -228,6 +321,7 @@
                     patientAddress: $('#patientAddress').val(),
                     totalPrice: $('#totalPrice').val(),
                     totalVat: $('#totalVat').val(),
+                    couponDiscount: $('#couponDiscount').val(),
                     finalPrice: $('#finalPrice').val(),
                     items: []
                 };
@@ -256,7 +350,15 @@
                     success: function(response) {
                         // Handle successful response
                         toastr.success("Receipt generated successfully!");
-                        // alert('Receipt generated successfully!');
+                        // Disable form elements and buttons after generating receipt
+                        $('#generateReceipt').prop('disabled', true);
+                        $('#addTest').prop('disabled', true);
+                        $('#addPackage').prop('disabled', true);
+                        $('#patientName').prop('disabled', true);
+                        $('#patientAge').prop('disabled', true);
+                        $('#patientAddress').prop('disabled', true);
+                        $('.discountInput').prop('disabled', true);
+                        $('.removeItem').prop('disabled', true);
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
@@ -266,6 +368,42 @@
                 });
             });
 
+            $('#pdfReceipt').click(function() {
+                var formData = {
+                    patientName: $('#patientName').val(),
+                    patientAge: $('#patientAge').val(),
+                    patientAddress: $('#patientAddress').val(),
+                    totalPrice: $('#totalPrice').val(),
+                    totalVat: $('#totalVat').val(),
+                    finalPrice: $('#finalPrice').val(),
+                    items: []
+                };
+
+                $('#selectedItems2 tr').each(function() {
+                    var item = {
+                        item_id: $(this).data('id'),
+                        type: $(this).data('type'),
+                        name: $(this).find('td:eq(0)').text(),
+                        fee: parseFloat($(this).find('td:eq(1)').text()),
+                        totalDiscount: parseFloat($(this).find('td:eq(2) input').val()),
+                        patientDiscount: parseFloat($(this).find('td:eq(3)').text()),
+                        referenceDiscount: parseFloat($(this).find('td:eq(4)').text()),
+                        doctorCommission: parseFloat($(this).find('td:eq(5)').text()),
+                        payment: parseFloat($(this).find('td:eq(6)').text())
+                    };
+                    formData.items.push(item);
+                });
+
+                console.log('object', formData);
+
+                $('#pdf_patientName').val(formData.patientName);
+                $('#pdf_patientAge').val(formData.patientAge);
+                $('#pdf_patientAddress').val(formData.patientAddress);
+                $('#pdf_totalPrice').val(formData.totalPrice);
+                $('#pdf_totalVat').val(formData.totalVat);
+                $('#pdf_finalPrice').val(formData.finalPrice);
+                $('#pdf_items').val(JSON.stringify(formData.items));
+            });
         });
     </script>
 @endsection

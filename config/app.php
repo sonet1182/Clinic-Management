@@ -69,7 +69,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Dhaka',
 
     /*
     |--------------------------------------------------------------------------
@@ -163,6 +163,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Meneses\LaravelMpdf\LaravelMpdfServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -171,6 +172,8 @@ return [
          Yajra\DataTables\ButtonsServiceProvider::class,
          Spatie\Permission\PermissionServiceProvider::class,
          Maatwebsite\Excel\ExcelServiceProvider::class,
+        //  Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
+         
 
         /*
          * Application Service Providers...
@@ -197,6 +200,8 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'Image' => Intervention\Image\Facades\Image::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        // 'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class,
+        'PDF' => Meneses\LaravelMpdf\Facades\LaravelMpdf::class,
     ])->toArray(),
 
 ];

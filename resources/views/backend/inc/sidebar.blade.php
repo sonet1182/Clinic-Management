@@ -75,7 +75,7 @@
                         <a href="#" class="nav-link {{ request()->is('admin/receipts*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-table"></i>
                             <p>
-                                Receiprt
+                                Receipt
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -85,7 +85,7 @@
                                     <a href="{{ route('receipts.index') }}"
                                         class="nav-link {{ request()->is('admin/receipts') ? 'active' : '' }}">
                                         <i class="fa fa-list nav-icon"></i>
-                                        <p>receipt List</p>
+                                        <p>Receipt List</p>
                                     </a>
                                 </li>
                             @endcan
@@ -101,6 +101,25 @@
                         </ul>
                     </li>
                 @endcan
+
+                <li class="nav-item {{ request()->is('admin/promocodes*') ? 'menu-open active' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/promocodes*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>
+                            Promo Code
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('promocodes.index') }}"
+                                class="nav-link {{ request()->is('admin/promocodes') ? 'active' : '' }}">
+                                <i class="fas fa-list nav-icon"></i>
+                                <p>Promo Code List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
 
 
@@ -207,27 +226,57 @@
                     </li>
                 @endcan
 
-                @can('promo-code-list')
-                    <li class="nav-item {{ request()->is('admin/promocodes*') ? 'menu-open active' : '' }}">
-                        <a href="#" class="nav-link {{ request()->is('admin/promocodes*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-star"></i>
-                            <p>
-                                Promo Code
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('promocodes.index') }}"
-                                    class="nav-link {{ request()->is('admin/promocodes') ? 'active' : '' }}">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Promo Code List</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                @endcan
+                --}}
 
+                
+
+                <li class="nav-header">STAFF Management</li>
+
+                <li class="nav-item {{ request()->is('admin/doctors*') ? 'menu-open active' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/doctors*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-md"></i>
+                        <p>
+                            Doctors
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            <a href="{{ route('doctors.index') }}"
+                                class="nav-link {{ request()->is('admin/doctors') ? 'active' : '' }}">
+                                <i class="fas fa-list nav-icon"></i>
+                                <p>Doctor List</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <li class="nav-item {{ request()->is('admin/employees*') ? 'menu-open active' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/employees*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tags"></i>
+                        <p>
+                            Employees
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            <a href="{{ route('employees.index') }}"
+                                class="nav-link {{ request()->is('admin/employees') ? 'active' : '' }}">
+                                <i class="fas fa-list nav-icon"></i>
+                                <p>Employee List</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                
+
+                {{--
 
                 @can('product-list')
                     <li class="nav-item {{ request()->is('admin/products*') ? 'menu-open active' : '' }}">
@@ -460,7 +509,7 @@
 
                 <li class="nav-item">
                     <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();"
                         class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>

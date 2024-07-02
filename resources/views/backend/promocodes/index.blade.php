@@ -107,7 +107,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-12 mb-3">
+                                    {{-- <div class="col-md-12 mb-3">
                                         <label for="validationCustom01">Image</label>
 
                                         <input class="form-control" name="image" type="file"
@@ -118,7 +118,7 @@
                                                 {{ $message }}
                                             @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-md-6 mb-3">
                                         <label for="validationCustom02">Status</label>
@@ -152,7 +152,6 @@
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>Image</th>
                         <th>Name</th>
                         <th>Code</th>
                         <th>Type</th>
@@ -215,10 +214,6 @@
                         name: 'id'
                     },
                     {
-                        data: 'imageview',
-                        name: 'imageview'
-                    },
-                    {
                         data: 'name',
                         name: 'name'
                     },
@@ -261,7 +256,7 @@
 
                 if (confirm('Are you sure you want to delete this record?')) {
                     $.ajax({
-                        url: '/promocodes/' + rowId,
+                        url: 'promocodes/' + rowId,
                         type: 'DELETE',
                         data: {
                             '_token': '{{ csrf_token() }}',

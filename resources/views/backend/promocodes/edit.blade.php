@@ -79,7 +79,7 @@
 
         </div>
 
-        <div class="col-md-12 mb-3">
+        {{-- <div class="col-md-12 mb-3">
             <label for="validationCustom01">Image</label>
 
             <input class="form-control" name="image" type="file"
@@ -93,7 +93,7 @@
                     {{ $message }}
                 @enderror
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-md-6 mb-3">
             <label for="validationCustom02">Status</label>

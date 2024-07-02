@@ -12,6 +12,8 @@ use App\Http\Controllers\backend\ReceiptController;
 use App\Http\Controllers\backend\TestController;
 use App\Http\Controllers\backend\WebSettingsController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\frontend\HomepageController;
 use App\Http\Controllers\frontend\ProductController as FrontendProductController;
 use App\Http\Controllers\HomeController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\Zone\DistrictController;
 use App\Http\Controllers\Zone\DivisionController;
 use App\Http\Controllers\Zone\ThanaController;
 use App\Http\Controllers\Zone\ZoneController;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +66,9 @@ Route::get('/district-list', [ZoneController::class, "districts"]);
 Route::get('/thana-list', [ZoneController::class, "thanas"]);
 
 
+Route::get('/download', [ReceiptController::class, "download"]);
+
+
 
 //New Routes for Backend
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
@@ -84,6 +90,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
     //Brand
     Route::resource('brands', BrandController::class);
     Route::get('brand_list', [BrandController::class, 'list'])->name('brands.list');
+
+    //Doctor
+    Route::resource('doctors', DoctorController::class);
+    Route::get('doctor_list', [DoctorController::class, 'list'])->name('doctors.list');
+
+    //Doctor
+    Route::resource('employees', EmployeeController::class);
+    Route::get('employee_list', [EmployeeController::class, 'list'])->name('employees.list');
+
     //Offer
     Route::resource('offers', OfferController::class);
     Route::get('offer_list', [OfferController::class, 'list'])->name('offers.list');
@@ -100,9 +115,14 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
     Route::resource('packages', PackageController::class);
     Route::get('package_list', [PackageController::class, 'list'])->name('packages.list');
 
-    //package
+    //receipt
     Route::resource('receipts', ReceiptController::class);
     Route::get('receipt_list', [ReceiptController::class, 'list'])->name('receipt.list');
+    Route::post('/generate-pdf', [ReceiptController::class, 'generatePDF'])->name('generate.pdf');
+    Route::get('/print/{id}', [ReceiptController::class, 'printPDF'])->name('print');
+
+    Route::post('/validate-promo-code', [ReceiptController::class, 'validatePromoCode'])->name('validate.promo.code');
+
 
 
     //Promo Code

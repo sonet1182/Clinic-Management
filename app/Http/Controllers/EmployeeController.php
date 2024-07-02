@@ -2,36 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
+use App\Models\Doctor;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class BrandController extends Controller
+class EmployeeController extends Controller
 {
     public function index()
     {
-        return view('brands.index');
+        return view('employee.index');
     }
 
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $data = Brand::all();
+            $data = Employee::all();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('imageview', function ($row) {
-                    if (!empty($row->logo)) {
-                        $imageUrl = $row->logo;
+                    if (!empty($row->image)) {
+                        $imageUrl = $row->image;
                     } else {
                         $imageUrl = asset('demo_img.jpg');
                     }
                     return '<a href="' . $imageUrl . '" data-lightbox="product-gallery" data-title="">
-                        <img src="/' . $imageUrl . '" alt="Brand Image" class="img-thumbnail" width="50" height="50">
+                        <img src="/' . $imageUrl . '" alt="Employee Image" class="img-thumbnail" width="50" height="50">
                     </a>';
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('brands.edit', $row->id);
-                    $deleteUrl = route('brands.destroy', $row->id);
+                    $editUrl = route('employees.edit', $row->id);
+                    $deleteUrl = route('employees.destroy', $row->id);
 
                     $actionBtn = '';
 
@@ -56,13 +57,13 @@ class BrandController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate(Brand::rules(), Brand::messages());
-        $validatedData['logo'] = $this->UploadImage($request, 'image', 'images/brands/', '300', '300');
-        Brand::create($validatedData);
+        $validatedData = $request->validate(Employee::rules(), Employee::messages());
+        $validatedData['image'] = $this->UploadImage($request, 'image', 'images/employees/', '300', '300');
+        Employee::create($validatedData);
 
         $notification = array(
             'alert-type' => 'success',
-            'message' => 'Brand has been added'
+            'message' => 'Employee has been added'
         );
 
         return back()->with($notification);
@@ -71,8 +72,8 @@ class BrandController extends Controller
 
     public function edit($id)
     {
-        $post = Brand::findOrFail($id);
-        return view('brands.edit', compact('post'));
+        $post = Employee::findOrFail($id);
+        return view('employee.edit', compact('post'));
     }
 
 
@@ -80,17 +81,18 @@ class BrandController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:brands,slug,' . $id,
+            'post' => 'required',
+            'phone' => 'nullable',
         ]);
 
-        $brand = Brand::findOrFail($id);
-        $validatedData['logo'] = $this->UploadImage($request, 'image', 'images/brands/', '300', '300', $brand->logo);
+        $doctor = Employee::findOrFail($id);
+        $validatedData['image'] = $this->UploadImage($request, 'image', 'images/employees/', '300', '300', $doctor->image);
 
-        $brand->update($validatedData);
+        $doctor->update($validatedData);
 
         $notification = array(
             'alert-type' => 'success',
-            'message' => 'Brand has been updated'
+            'message' => 'Employee has been updated'
         );
 
         return back()->with($notification);

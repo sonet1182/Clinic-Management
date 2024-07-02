@@ -48,6 +48,7 @@
                             <th>Patient Address</th>
                             <th>Total Price</th>
                             <th>Total VAT</th>
+                            <th>Coupon Discount</th>
                             <th>Final Price</th>
                             <th>Generated At</th>
                             <th>Action</th>
@@ -120,6 +121,10 @@
                     {
                         data: 'total_vat',
                         name: 'total_vat'
+                    },
+                    {
+                        data: 'coupon_discount',
+                        name: 'coupon_discount'
                     },
                     {
                         data: 'final_price',
