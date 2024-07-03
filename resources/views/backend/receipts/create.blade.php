@@ -75,11 +75,36 @@
                         </div>
                     </div>
 
+                    <hr>
+
+                    <div class="">
+                        <label for="clinicAccount">Discount/Commission:</label>
+
+                        <div class="form-group">
+                            <input type="checkbox" id="givePatientDiscount" checked> Patient Discount
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="giveReferenceDiscount" checked> Reference Discount
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="giveDoctorCommission" checked> Doctor Commission
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="clinicAccount">Clinic Account:</label>
+                        <input type="number" class="form-control" id="clinicAccount" name="clinicAccount" readonly>
+                    </div>
+
+                    <hr>
+
                     <div class="form-group">
                         <label for="promoCode">Promo Code:</label>
                         <input type="text" class="form-control" id="promoCode" name="promoCode">
                         <button type="button" class="btn btn-primary mt-2" id="applyPromoCode">Apply</button>
                     </div>
+
+
 
                 </form>
             </div>
@@ -122,8 +147,8 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="finalPrice">Total Fee with VAT:</label>
-                        <input type="number" class="form-control text-success text-bold" id="finalPrice" name="finalPrice"
-                            readonly>
+                        <input type="number" class="form-control text-success text-bold" id="finalPrice"
+                            name="finalPrice" readonly>
                     </div>
                 </div>
 
@@ -161,249 +186,263 @@
 @endsection
 
 @section('scripts')
-    <script>
-        $(document).ready(function() {
-            // Initialize select2 for test and package selection
-            $('.testSelect, .packageSelect').select2();
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for test and package selection
+        $('.testSelect, .packageSelect').select2();
 
-            // Add test to the selected list
-            $('#addTest').click(function() {
-                var testName = $('#test option:selected').text();
-                var testPrice = $('#test option:selected').data('price');
-                var itemId = $('#test option:selected').data('id'); // Fetch item_id
-                var type = 'test'; // Set type
-                $('#selectedItems2').append('<tr data-id="' + itemId + '" data-type="' + type + '"><td>' +
-                    testName + '</td>  <td>' +
-                    testPrice +
-                    ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
-                );
-                calculateTotalPrice();
-            });
-
-
-            // Add package to the selected list
-            $('#addPackage').click(function() {
-                var packageName = $('#package option:selected').text();
-                var packagePrice = $('#package option:selected').data('price');
-                var itemId = $('#package option:selected').data('id'); // Fetch item_id
-                var type = 'package'; // Set type
-                $('#selectedItems2').append('<tr data-id="' + itemId + '" data-type="' + type + '"><td>' +
-                    packageName + '</td>  <td>' +
-                    packagePrice +
-                    ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
-                );
-                calculateTotalPrice();
-            });
+        // Add test to the selected list
+        $('#addTest').click(function() {
+            var testName = $('#test option:selected').text();
+            var testPrice = $('#test option:selected').data('price');
+            var itemId = $('#test option:selected').data('id'); // Fetch item_id
+            var type = 'test'; // Set type
+            $('#selectedItems2').append('<tr data-id="' + itemId + '" data-type="' + type + '"><td>' +
+                testName + '</td>  <td>' +
+                testPrice +
+                ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
+            );
+            calculateTotalPrice();
+        });
 
 
-            // Remove item from the list
-            $(document).on('click', '.removeItem', function() {
-                $(this).closest('tr').remove();
-                calculateTotalPrice();
-            });
+        // Add package to the selected list
+        $('#addPackage').click(function() {
+            var packageName = $('#package option:selected').text();
+            var packagePrice = $('#package option:selected').data('price');
+            var itemId = $('#package option:selected').data('id'); // Fetch item_id
+            var type = 'package'; // Set type
+            $('#selectedItems2').append('<tr data-id="' + itemId + '" data-type="' + type + '"><td>' +
+                packageName + '</td>  <td>' +
+                packagePrice +
+                ' Tk</td> <td><input type="number" class="form-control discountInput" value="30"></td> <td></td> <td></td> <td></td> <td></td> <td> <button type="button" class="btn btn-sm btn-danger removeItem">Remove</button></td></tr>'
+            );
+            calculateTotalPrice();
+        });
 
 
-            $('#applyPromoCode').click(function() {
-                var promoCode = $('#promoCode').val();
-
-                $.ajax({
-                    url: '{{ route('validate.promo.code') }}',
-                    method: 'POST',
-                    data: {
-                        promoCode: promoCode
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            applyPromoCodeDiscount(response.promoCode);
-                        } else {
-                            toastr.error(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error('Error validating promo code');
-                    }
-                });
-            });
-
-            function applyPromoCodeDiscount(promoCode) {
-                var discountAmount = 0;
-                var totalFeeWithVAT = parseFloat($('#finalPrice').val());
-
-                if (promoCode.type == 1) {
-                    discountAmount = totalFeeWithVAT * (promoCode.amount / 100);
-                } else if (promoCode.type == 2) {
-                    discountAmount = promoCode.amount;
-                }
-
-                var finalPriceAfterDiscount = totalFeeWithVAT - discountAmount;
-
-                $('#finalPrice').val(finalPriceAfterDiscount.toFixed(2));
-                $('#couponDiscount').val(discountAmount.toFixed(2));
-                $('#pdf_couponDiscount').val(discountAmount.toFixed(2));
-            }
+        // Remove item from the list
+        $(document).on('click', '.removeItem', function() {
+            $(this).closest('tr').remove();
+            calculateTotalPrice();
+        });
 
 
+        $('#applyPromoCode').click(function() {
+            var promoCode = $('#promoCode').val();
 
-            // Calculate total price
-            function calculateTotalPrice() {
-                var totalFee = 0;
-                var totalPatientDiscount = 0;
-                var totalReferenceDiscount = 0;
-                var totalDoctorCommission = 0;
-                var totalPatientPayment = 0;
-
-                $('#selectedItems2 tr').each(function() {
-                    var fee = parseFloat($(this).find('td:eq(1)').text());
-                    totalFee += fee;
-
-                    var discountPercentage = parseFloat($(this).find('td:eq(2) input').val());
-                    var discountAmount = fee * (discountPercentage / 100);
-                    var discountedFee = fee - discountAmount;
-
-                    if ($(this).data('type') === 'package') {
-                        // Package discount distribution
-                        var patientDiscount = discountAmount * 0.5;
-                        var referenceDiscount = discountAmount * 0.25;
-                        var doctorCommission = discountAmount * 0.25;
+            $.ajax({
+                url: '{{ route('validate.promo.code') }}',
+                method: 'POST',
+                data: {
+                    promoCode: promoCode
+                },
+                success: function(response) {
+                    if (response.success) {
+                        applyPromoCodeDiscount(response.promoCode);
                     } else {
-                        // Test discount distribution
-                        var patientDiscount = discountAmount / 3;
-                        var referenceDiscount = discountAmount / 3;
-                        var doctorCommission = discountAmount / 3;
+                        toastr.error(response.message);
                     }
-
-                    var patientPayment = discountedFee;
-
-                    totalPatientDiscount += patientDiscount;
-                    totalReferenceDiscount += referenceDiscount;
-                    totalDoctorCommission += doctorCommission;
-                    totalPatientPayment += patientPayment;
-
-                    $(this).find('td:eq(3)').text(patientDiscount.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(4)').text(referenceDiscount.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(5)').text(doctorCommission.toFixed(2) + ' Tk');
-                    $(this).find('td:eq(6)').text(patientPayment.toFixed(2) + ' Tk');
-                });
-
-                var totalVAT = totalPatientPayment * 0.15;
-                var finalTotalPrice = totalPatientPayment + totalVAT;
-
-                $('#totalPrice').val(totalPatientPayment.toFixed(2));
-                $('#totalVat').val(totalVAT.toFixed(2));
-                $('#finalPrice').val(finalTotalPrice.toFixed(2));
-
-                // var totalFeeWithVAT = totalPatientPayment + totalVAT;
-                // $('#finalPrice').val(totalFeeWithVAT.toFixed(2));
-
-                var promoCode = $('#promoCode').val();
-                if (promoCode) {
-                    $('#applyPromoCode').click();
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Error validating promo code');
                 }
-            }
-
-            // Recalculate total price when discount input changes
-            $(document).on('input', '.discountInput', function() {
-                calculateTotalPrice();
-            });
-
-            // Handle form submission
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $('#generateReceipt').click(function() {
-                // Collect form data
-                var formData = {
-                    patientName: $('#patientName').val(),
-                    patientAge: $('#patientAge').val(),
-                    patientAddress: $('#patientAddress').val(),
-                    totalPrice: $('#totalPrice').val(),
-                    totalVat: $('#totalVat').val(),
-                    couponDiscount: $('#couponDiscount').val(),
-                    finalPrice: $('#finalPrice').val(),
-                    items: []
-                };
-
-                // Collect selected items data
-                $('#selectedItems2 tr').each(function() {
-                    var item = {
-                        item_id: $(this).data('id'), // Add item_id from data attribute
-                        type: $(this).data('type'), // Add type from data attribute
-                        name: $(this).find('td:eq(0)').text(),
-                        fee: parseFloat($(this).find('td:eq(1)').text()),
-                        totalDiscount: parseFloat($(this).find('td:eq(2) input').val()),
-                        patientDiscount: parseFloat($(this).find('td:eq(3)').text()),
-                        referenceDiscount: parseFloat($(this).find('td:eq(4)').text()),
-                        doctorCommission: parseFloat($(this).find('td:eq(5)').text()),
-                        payment: parseFloat($(this).find('td:eq(6)').text())
-                    };
-                    formData.items.push(item);
-                });
-
-                // Send data to the server via AJAX
-                $.ajax({
-                    url: $('#memoForm').attr('action'),
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        // Handle successful response
-                        toastr.success("Receipt generated successfully!");
-                        // Disable form elements and buttons after generating receipt
-                        $('#generateReceipt').prop('disabled', true);
-                        $('#addTest').prop('disabled', true);
-                        $('#addPackage').prop('disabled', true);
-                        $('#patientName').prop('disabled', true);
-                        $('#patientAge').prop('disabled', true);
-                        $('#patientAddress').prop('disabled', true);
-                        $('.discountInput').prop('disabled', true);
-                        $('.removeItem').prop('disabled', true);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        var errorResponse = JSON.parse(xhr.responseText);
-                        toastr.error(errorResponse.message);
-                    }
-                });
-            });
-
-            $('#pdfReceipt').click(function() {
-                var formData = {
-                    patientName: $('#patientName').val(),
-                    patientAge: $('#patientAge').val(),
-                    patientAddress: $('#patientAddress').val(),
-                    totalPrice: $('#totalPrice').val(),
-                    totalVat: $('#totalVat').val(),
-                    finalPrice: $('#finalPrice').val(),
-                    items: []
-                };
-
-                $('#selectedItems2 tr').each(function() {
-                    var item = {
-                        item_id: $(this).data('id'),
-                        type: $(this).data('type'),
-                        name: $(this).find('td:eq(0)').text(),
-                        fee: parseFloat($(this).find('td:eq(1)').text()),
-                        totalDiscount: parseFloat($(this).find('td:eq(2) input').val()),
-                        patientDiscount: parseFloat($(this).find('td:eq(3)').text()),
-                        referenceDiscount: parseFloat($(this).find('td:eq(4)').text()),
-                        doctorCommission: parseFloat($(this).find('td:eq(5)').text()),
-                        payment: parseFloat($(this).find('td:eq(6)').text())
-                    };
-                    formData.items.push(item);
-                });
-
-                console.log('object', formData);
-
-                $('#pdf_patientName').val(formData.patientName);
-                $('#pdf_patientAge').val(formData.patientAge);
-                $('#pdf_patientAddress').val(formData.patientAddress);
-                $('#pdf_totalPrice').val(formData.totalPrice);
-                $('#pdf_totalVat').val(formData.totalVat);
-                $('#pdf_finalPrice').val(formData.finalPrice);
-                $('#pdf_items').val(JSON.stringify(formData.items));
             });
         });
-    </script>
+
+        function applyPromoCodeDiscount(promoCode) {
+            var discountAmount = 0;
+            var totalFeeWithVAT = parseFloat($('#finalPrice').val());
+
+            if (promoCode.type == 1) {
+                discountAmount = totalFeeWithVAT * (promoCode.amount / 100);
+            } else if (promoCode.type == 2) {
+                discountAmount = promoCode.amount;
+            }
+
+            var finalPriceAfterDiscount = totalFeeWithVAT - discountAmount;
+
+            $('#finalPrice').val(finalPriceAfterDiscount.toFixed(2));
+            $('#couponDiscount').val(discountAmount.toFixed(2));
+            $('#pdf_couponDiscount').val(discountAmount.toFixed(2));
+        }
+
+
+
+        // Calculate total price
+        function calculateTotalPrice() {
+            var totalFee = 0;
+            var totalPatientDiscount = 0;
+            var totalReferenceDiscount = 0;
+            var totalDoctorCommission = 0;
+            var totalPatientPayment = 0;
+            var clinicAccount = 0; // Initialize clinic account variable
+
+            $('#selectedItems2 tr').each(function() {
+                var fee = parseFloat($(this).find('td:eq(1)').text());
+                totalFee += fee;
+
+                var discountPercentage = parseFloat($(this).find('td:eq(2) input').val());
+                var discountAmount = fee * (discountPercentage / 100);
+                var discountedFee = fee - discountAmount;
+
+                var patientDiscount = 0,
+                    referenceDiscount = 0,
+                    doctorCommission = 0;
+
+                if ($(this).data('type') === 'package') {
+                    // Package discount distribution
+                    if ($('#givePatientDiscount').is(':checked')) patientDiscount = discountAmount *
+                        0.5;
+                    if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount *
+                        0.25;
+                    if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount *
+                        0.25;
+                } else {
+                    // Test discount distribution
+                    if ($('#givePatientDiscount').is(':checked')) patientDiscount = discountAmount / 3;
+                    if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount /
+                        3;
+                    if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount /
+                        3;
+                }
+
+                var patientPayment = discountedFee;
+
+                totalPatientDiscount += patientDiscount;
+                totalReferenceDiscount += referenceDiscount;
+                totalDoctorCommission += doctorCommission;
+                totalPatientPayment += patientPayment;
+
+                // Add undistributed discount to clinic account
+                clinicAccount += discountAmount - (patientDiscount + referenceDiscount +
+                    doctorCommission);
+
+                $(this).find('td:eq(3)').text(patientDiscount.toFixed(2) + ' Tk');
+                $(this).find('td:eq(4)').text(referenceDiscount.toFixed(2) + ' Tk');
+                $(this).find('td:eq(5)').text(doctorCommission.toFixed(2) + ' Tk');
+                $(this).find('td:eq(6)').text(patientPayment.toFixed(2) + ' Tk');
+            });
+
+            var totalVAT = totalPatientPayment * 0.15;
+            var finalTotalPrice = totalPatientPayment + totalVAT;
+
+            $('#totalPrice').val(totalPatientPayment.toFixed(2));
+            $('#totalVat').val(totalVAT.toFixed(2));
+            $('#finalPrice').val(finalTotalPrice.toFixed(2));
+            $('#clinicAccount').val(clinicAccount.toFixed(2)); // Update clinic account value
+
+            var promoCode = $('#promoCode').val();
+            if (promoCode) {
+                $('#applyPromoCode').click();
+            }
+        }
+
+
+        // Recalculate total price when discount input changes
+        $(document).on('input', '.discountInput', function() {
+            calculateTotalPrice();
+        });
+
+        // Handle form submission
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $('#generateReceipt').click(function() {
+            // Collect form data
+            var formData = {
+                patientName: $('#patientName').val(),
+                patientAge: $('#patientAge').val(),
+                patientAddress: $('#patientAddress').val(),
+                totalPrice: $('#totalPrice').val(),
+                totalVat: $('#totalVat').val(),
+                couponDiscount: $('#couponDiscount').val(),
+                clinicAccount: $('#clinicAccount').val(),
+                finalPrice: $('#finalPrice').val(),
+                items: []
+            };
+
+            // Collect selected items data
+            $('#selectedItems2 tr').each(function() {
+                var item = {
+                    item_id: $(this).data('id'), // Add item_id from data attribute
+                    type: $(this).data('type'), // Add type from data attribute
+                    name: $(this).find('td:eq(0)').text(),
+                    fee: parseFloat($(this).find('td:eq(1)').text()),
+                    totalDiscount: parseFloat($(this).find('td:eq(2) input').val()),
+                    patientDiscount: parseFloat($(this).find('td:eq(3)').text()),
+                    referenceDiscount: parseFloat($(this).find('td:eq(4)').text()),
+                    doctorCommission: parseFloat($(this).find('td:eq(5)').text()),
+                    payment: parseFloat($(this).find('td:eq(6)').text()),
+                };
+                formData.items.push(item);
+            });
+
+            // Send data to the server via AJAX
+            $.ajax({
+                url: $('#memoForm').attr('action'),
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    // Handle successful response
+                    toastr.success("Receipt generated successfully!");
+                    // Disable form elements and buttons after generating receipt
+                    $('#generateReceipt').prop('disabled', true);
+                    $('#addTest').prop('disabled', true);
+                    $('#addPackage').prop('disabled', true);
+                    $('#patientName').prop('disabled', true);
+                    $('#patientAge').prop('disabled', true);
+                    $('#patientAddress').prop('disabled', true);
+                    $('.discountInput').prop('disabled', true);
+                    $('.removeItem').prop('disabled', true);
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    toastr.error(errorResponse.message);
+                }
+            });
+        });
+
+        $('#pdfReceipt').click(function() {
+            var formData = {
+                patientName: $('#patientName').val(),
+                patientAge: $('#patientAge').val(),
+                patientAddress: $('#patientAddress').val(),
+                totalPrice: $('#totalPrice').val(),
+                totalVat: $('#totalVat').val(),
+                finalPrice: $('#finalPrice').val(),
+                items: []
+            };
+
+            $('#selectedItems2 tr').each(function() {
+                var item = {
+                    item_id: $(this).data('id'),
+                    type: $(this).data('type'),
+                    name: $(this).find('td:eq(0)').text(),
+                    fee: parseFloat($(this).find('td:eq(1)').text()),
+                    totalDiscount: parseFloat($(this).find('td:eq(2) input').val()),
+                    patientDiscount: parseFloat($(this).find('td:eq(3)').text()),
+                    referenceDiscount: parseFloat($(this).find('td:eq(4)').text()),
+                    doctorCommission: parseFloat($(this).find('td:eq(5)').text()),
+                    payment: parseFloat($(this).find('td:eq(6)').text())
+                };
+                formData.items.push(item);
+            });
+
+            console.log('object', formData);
+
+            $('#pdf_patientName').val(formData.patientName);
+            $('#pdf_patientAge').val(formData.patientAge);
+            $('#pdf_patientAddress').val(formData.patientAddress);
+            $('#pdf_totalPrice').val(formData.totalPrice);
+            $('#pdf_totalVat').val(formData.totalVat);
+            $('#pdf_finalPrice').val(formData.finalPrice);
+            $('#pdf_items').val(JSON.stringify(formData.items));
+        });
+    });
+</script>
 @endsection

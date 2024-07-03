@@ -96,4 +96,17 @@ class DoctorController extends Controller
 
         return back()->with($notification);
     }
+
+    public function destroy($id)
+    {
+        $data = Doctor::find($id);
+
+        if (!$data) {
+            return response()->json(['success' => false, 'message' => 'Record not found'], 404);
+        }
+
+        $data->delete();
+
+        return response()->json(['success' => true, 'message' => 'Record deleted successfully']);
+    }
 }

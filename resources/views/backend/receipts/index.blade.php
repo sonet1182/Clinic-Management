@@ -49,6 +49,7 @@
                             <th>Total Price</th>
                             <th>Total VAT</th>
                             <th>Coupon Discount</th>
+                            <th>Clinic Acount</th>
                             <th>Final Price</th>
                             <th>Generated At</th>
                             <th>Action</th>
@@ -125,6 +126,10 @@
                     {
                         data: 'coupon_discount',
                         name: 'coupon_discount'
+                    },
+                    {
+                        data: 'clinic_account',
+                        name: 'clinic_account'
                     },
                     {
                         data: 'final_price',

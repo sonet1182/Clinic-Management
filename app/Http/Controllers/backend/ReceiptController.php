@@ -95,6 +95,7 @@ class ReceiptController extends Controller
         $receipt->total_price = $request->input('totalPrice');
         $receipt->total_vat = $request->input('totalVat');
         $receipt->coupon_discount = $request->input('couponDiscount');
+        $receipt->clinic_account = $request->input('clinicAccount');
         $receipt->final_price = $request->input('finalPrice');
         $receipt->items = json_encode($request->input('items'));
         $receipt->save();
