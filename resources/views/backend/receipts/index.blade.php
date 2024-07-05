@@ -44,15 +44,20 @@
                         <tr>
                             <th>Id</th>
                             <th>Patient Name</th>
-                            <th>Patient Age</th>
-                            <th>Patient Address</th>
+                            <th>Age</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                            <th>Type</th>
+                            <th>Ref Doc. name</th>
+                            <th>Room</th>
                             <th>Total Price</th>
                             <th>Total VAT</th>
                             <th>Coupon Discount</th>
                             <th>Clinic Acount</th>
                             <th>Final Price</th>
-                            <th>Generated At</th>
-                            <th>Action</th>
+                            <th style="width: 150px">Generated At</th>
+                            <th style="width: 80px">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,6 +104,7 @@
                             'content'));
                     },
                 },
+                order: [[0, 'desc']],
                 columns: [{
                         data: 'id',
                         name: 'id'
@@ -114,6 +120,26 @@
                     {
                         data: 'patient_address',
                         name: 'patient_address'
+                    },
+                    {
+                        data: 'patient_phone',
+                        name: 'patient_phone'
+                    },
+                    {
+                        data: 'patient_gender',
+                        name: 'patient_gender'
+                    },
+                    {
+                        data: 'patient_type',
+                        name: 'patient_type'
+                    },
+                    {
+                        data: 'doctor_name',
+                        name: 'doctor_name'
+                    },
+                    {
+                        data: 'doctor_room',
+                        name: 'doctor_room'
                     },
                     {
                         data: 'total_price',

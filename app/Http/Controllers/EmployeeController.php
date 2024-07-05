@@ -97,4 +97,28 @@ class EmployeeController extends Controller
 
         return back()->with($notification);
     }
+
+
+    public function destroy($id)
+    {
+        $data = Employee::find($id);
+
+        if (!$data) {
+            $notification = [
+                'alert-type' => 'error',
+                'message' => 'Record Not Found!',
+            ];
+    
+            return back()->with($notification);
+        }
+
+        $data->delete();
+
+        $notification = [
+            'alert-type' => 'success',
+            'message' => 'Record Deleted Successfully!',
+        ];
+
+        return back()->with($notification);
+    }
 }

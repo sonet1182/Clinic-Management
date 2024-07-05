@@ -92,6 +92,14 @@ class ReceiptController extends Controller
         $receipt->patient_name = $request->input('patientName');
         $receipt->patient_age = $request->input('patientAge');
         $receipt->patient_address = $request->input('patientAddress');
+
+        $receipt->patient_phone = $request->input('patientPhone');
+        $receipt->patient_type = $request->input('patientType');
+        $receipt->patient_gender = $request->input('patientGender');
+
+        $receipt->doctor_name = $request->input('doctorName');
+        $receipt->doctor_room = $request->input('doctorRoom');
+
         $receipt->total_price = $request->input('totalPrice');
         $receipt->total_vat = $request->input('totalVat');
         $receipt->coupon_discount = $request->input('couponDiscount');
@@ -118,7 +126,9 @@ class ReceiptController extends Controller
 
     function generatePDF(Request $request)
     {
-        // Custom validation messages
+
+        // return $request;
+
         $messages = [
             'pdf_patientName.required' => 'Patient Name is required.',
             'pdf_patientAge.required' => 'Patient Age is required.',
@@ -158,6 +168,7 @@ class ReceiptController extends Controller
     function pdf_html(Request $request)
     {
         // Fetch data from POST request
+        $patientId = $request->input('pdf_patientId');
         $patientName = $request->input('pdf_patientName');
         $patientAge = $request->input('pdf_patientAge');
         $patientAddress = $request->input('pdf_patientAddress');
@@ -167,85 +178,12 @@ class ReceiptController extends Controller
         $finalPrice = $request->input('pdf_finalPrice');
         $items = json_decode($request->input('pdf_items'), true); // Decode JSON string to array
 
-        // Create HTML content for the PDF
-        $html = '<html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body {
-                line-height: 1.6;
-                font-weight: 400;
-            }
-            .header {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .patient-info {
-                margin-bottom: 20px;
-            }
-            .item-list {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .item-list th, .item-list td {
-                border: 1px solid #000;
-                padding: 8px;
-            }
-            .totals {
-                margin-top: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Receipt</h1>
-        </div>
-        <div class="patient-info">
-            <p><strong>Patient Name:</strong> ' . htmlspecialchars($patientName) . '</p>
-            <p><strong>Patient Age:</strong> ' . htmlspecialchars($patientAge) . '</p>
-            <p><strong>Patient Address:</strong> ' . htmlspecialchars($patientAddress) . '</p>
-        </div>
-        <table class="item-list">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Fee</th>
-                    <th>Total Discount</th>
-                    <th>Patient Discount</th>
-                    <th>Reference Discount</th>
-                    <th>Doctor Commission</th>
-                    <th>Payment</th>
-                </tr>
-            </thead>
-            <tbody>';
 
-        // Loop through items and create rows
-        foreach ($items as $item) {
-            $html .= '<tr>
-                    <td>' . htmlspecialchars($item['name']) . '</td>
-                    <td>' . number_format($item['fee'], 2) . ' Tk</td>
-                    <td>' . number_format($item['totalDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['patientDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['referenceDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['doctorCommission'], 2) . ' Tk</td>
-                    <td>' . number_format($item['payment'], 2) . ' Tk</td>
-                </tr>';
-        }
+        $receipt_id = Receipt::withoutTrashed()->latest()->first()->id + 1;
+        $receipt = $request;
 
-        $html .= '</tbody>
-        </table>
-        <div class="totals">
-            <p><strong>Total Fee:</strong> ' . number_format($totalPrice, 2) . ' Tk</p>
-            <p><strong>Total VAT (15%):</strong> ' . number_format($totalVat, 2) . ' Tk</p>
-            <p><strong>Coupon Discount:</strong> ' . number_format($couponDiscount, 2) . ' Tk</p>
-            <p><strong>Total Fee with VAT:</strong> ' . number_format($finalPrice, 2) . ' Tk</p>
-        </div>
-    </body>
-    </html>';
-
-        return $html;
+        return view('pdf.document2', compact('receipt','receipt_id'));
     }
-
 
 
 
@@ -265,6 +203,13 @@ class ReceiptController extends Controller
         $pdf->WriteHTML($this->pdf_html_print($receipt));
 
         $pdf->Output();
+
+        $notification = [
+            'alert-type' => 'success',
+            'message' => 'Rceipt Generated!',
+        ];
+
+        return back()->with($notification);
     }
 
     public function pdf_html_print($receipt)
@@ -279,83 +224,7 @@ class ReceiptController extends Controller
         $finalPrice = $receipt->final_price;
         $items = json_decode($receipt->items, true); // Decode JSON string to array
 
-        // Create HTML content for the PDF
-        $html = '<html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body {
-                line-height: 1.6;
-                font-weight: 400;
-            }
-            .header {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .patient-info {
-                margin-bottom: 20px;
-            }
-            .item-list {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .item-list th, .item-list td {
-                border: 1px solid #000;
-                padding: 8px;
-            }
-            .totals {
-                margin-top: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Receipt</h1>
-        </div>
-        <div class="patient-info">
-            <p><strong>Patient Name:</strong> ' . htmlspecialchars($patientName) . '</p>
-            <p><strong>Patient Age:</strong> ' . htmlspecialchars($patientAge) . '</p>
-            <p><strong>Patient Address:</strong> ' . htmlspecialchars($patientAddress) . '</p>
-        </div>
-        <table class="item-list">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Fee</th>
-                    <th>Total Discount</th>
-                    <th>Patient Discount</th>
-                    <th>Reference Discount</th>
-                    <th>Doctor Commission</th>
-                    <th>Payment</th>
-                </tr>
-            </thead>
-            <tbody>';
-
-        // Loop through items and create rows
-        foreach ($items as $item) {
-            $html .= '<tr>
-                    <td>' . htmlspecialchars($item['name']) . '</td>
-                    <td>' . number_format($item['fee'], 2) . ' Tk</td>
-                    <td>' . number_format($item['totalDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['patientDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['referenceDiscount'], 2) . ' Tk</td>
-                    <td>' . number_format($item['doctorCommission'], 2) . ' Tk</td>
-                    <td>' . number_format($item['payment'], 2) . ' Tk</td>
-                </tr>';
-        }
-
-        $html .= '</tbody>
-        </table>
-        <div class="totals">
-            <p><strong>Total Fee:</strong> ' . number_format($totalPrice, 2) . ' Tk</p>
-            <p><strong>Total VAT (15%):</strong> ' . number_format($totalVat, 2) . ' Tk</p>
-            <p><strong>Coupon Discount:</strong> ' . number_format($couponDiscount, 2) . ' Tk</p>
-            <p><strong>Total Fee with VAT:</strong> ' . number_format($finalPrice, 2) . ' Tk</p>
-        </div>
-    </body>
-    </html>';
-
-        return $html;
+        return view('pdf.document', compact('receipt'));
     }
 
 

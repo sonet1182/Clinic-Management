@@ -102,11 +102,21 @@ class DoctorController extends Controller
         $data = Doctor::find($id);
 
         if (!$data) {
-            return response()->json(['success' => false, 'message' => 'Record not found'], 404);
+            $notification = [
+                'alert-type' => 'error',
+                'message' => 'Record Not Found!',
+            ];
+
+            return back()->with($notification);
         }
 
         $data->delete();
 
-        return response()->json(['success' => true, 'message' => 'Record deleted successfully']);
+        $notification = [
+            'alert-type' => 'success',
+            'message' => 'Record Deleted Successfully!',
+        ];
+
+        return back()->with($notification);
     }
 }
