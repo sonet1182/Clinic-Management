@@ -85,6 +85,14 @@
                                                         </td>
                                                     </tr>
                                                 @endif
+
+                                                @if ($receipt->pdf_reference)
+                                                    <tr>
+                                                        <th style="text-align: left; color: #1A1C21;">Reference:</th>
+                                                        <td style="text-align: right;">{{ $receipt->pdf_reference }}
+                                                        </td>
+                                                    </tr>
+                                                @endif
                                             </table>
                                         </td>
                                     </tr>
@@ -189,6 +197,48 @@
                                                             {{ number_format($receipt->pdf_totalVat, 2) }} Tk
                                                         </td>
                                                     </tr>
+
+                                                    @if ($receipt->pdf_additionalCheckbox > 0)
+                                                        <tr>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px; text-align: end;"
+                                                                col-span="1">
+                                                                Needle:</td>
+                                                            <td style="padding-block: 12px; text-align: right;"
+                                                                col-span="1">
+                                                                {{ number_format($receipt->pdf_additionalCheckbox, 2) }} Tk
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+
+                                                    @if ($receipt->pdf_additionalCheckbox2 > 0)
+                                                        <tr>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px; text-align: end;"
+                                                                col-span="1">
+                                                                Red Tube:</td>
+                                                            <td style="padding-block: 12px; text-align: right;"
+                                                                col-span="1">
+                                                                {{ number_format($receipt->pdf_additionalCheckbox2, 2) }} Tk
+                                                            </td>
+                                                        </tr>
+                                                    @endif
+
+                                                    @if ($receipt->pdf_additionalInput && $receipt->pdf_additionalInput > 0)
+                                                        <tr>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px;" col-span="1"></td>
+                                                            <td style="padding-block: 12px; text-align: end;"
+                                                                col-span="1">
+                                                                Others:</td>
+                                                            <td style="padding-block: 12px; text-align: right;"
+                                                                col-span="1">
+                                                                {{ number_format($receipt->pdf_additionalInput, 2) }} Tk
+                                                            </td>
+                                                        </tr>
+                                                    @endif
 
                                                     <tr>
                                                         <td colspan="2"></td>

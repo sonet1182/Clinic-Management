@@ -9,6 +9,40 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @include('backend.asset.css')
+
+    <style>
+        .table-responsive {
+            overflow: auto;
+        }
+
+        .sticky-action {
+            position: -webkit-sticky;
+            /* for Safari */
+            position: sticky;
+            right: 0;
+            background: white;
+            z-index: 1;
+            /* to ensure it sits above other content */
+        }
+
+        .sticky-header {
+            position: -webkit-sticky;
+            /* for Safari */
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            /* to ensure it sits above other content */
+        }
+
+        th,
+        td {
+            white-space: nowrap;
+            /* Prevent text from wrapping */
+        }
+    </style>
+
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">

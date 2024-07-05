@@ -52,12 +52,13 @@
                             <th>Ref Doc. name</th>
                             <th>Room</th>
                             <th>Total Price</th>
-                            <th>Total VAT</th>
                             <th>Coupon Discount</th>
+                            <th>Total VAT</th>
                             <th>Clinic Acount</th>
+                            <th style="width: 150px">Item</th>
                             <th>Final Price</th>
                             <th style="width: 150px">Generated At</th>
-                            <th style="width: 80px">Action</th>
+                            <th style="width: 150px" class="sticky-header">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,16 +147,20 @@
                         name: 'total_price'
                     },
                     {
-                        data: 'total_vat',
-                        name: 'total_vat'
-                    },
-                    {
                         data: 'coupon_discount',
                         name: 'coupon_discount'
                     },
                     {
+                        data: 'total_vat',
+                        name: 'total_vat'
+                    },
+                    {
                         data: 'clinic_account',
                         name: 'clinic_account'
+                    },
+                    {
+                        data: 'item',
+                        name: 'item'
                     },
                     {
                         data: 'final_price',
@@ -169,7 +174,8 @@
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'sticky-action'
                     },
                 ]
             });

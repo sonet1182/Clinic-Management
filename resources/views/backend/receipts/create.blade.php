@@ -184,12 +184,12 @@
                         <input type="number" class="form-control" id="totalPrice" name="totalPrice" readonly>
                     </div>
                     <div class="form-group col-md-3">
-                        <label for="totalVat">Total VAT (15%) :</label>
-                        <input type="number" class="form-control" id="totalVat" name="totalVat" readonly>
-                    </div>
-                    <div class="form-group col-md-3">
                         <label for="couponDiscount">Coupon Discount :</label>
                         <input type="number" class="form-control" id="couponDiscount" name="couponDiscount" readonly>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="totalVat">Total VAT (15%) :</label>
+                        <input type="number" class="form-control" id="totalVat" name="totalVat" readonly>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="finalPrice">Total Fee with VAT:</label>
@@ -213,6 +213,11 @@
                     <input type="hidden" name="pdf_reference" id="pdf_reference" value="">
                     <input type="hidden" name="pdf_doctorName" id="pdf_doctorName" value="">
                     <input type="hidden" name="pdf_doctorRoom" id="pdf_doctorRoom" value="">
+
+                    <input type="hidden" name="pdf_additionalCheckbox" id="pdf_additionalCheckbox" value="">
+                    <input type="hidden" name="pdf_additionalCheckbox2" id="pdf_additionalCheckbox2" value="">
+                    <input type="hidden" name="pdf_additionalInput" id="pdf_additionalInput" value="">
+
                     <input type="hidden" name="pdf_totalPrice" id="pdf_totalPrice" value="">
                     <input type="hidden" name="pdf_totalVat" id="pdf_totalVat" value="">
                     <input type="hidden" name="pdf_finalPrice" id="pdf_finalPrice" value="">
@@ -236,6 +241,21 @@
                         </div>
                     </div>
                 </form>
+
+                <div>
+                    <label>
+                        <input type="checkbox" id="additionalCheckbox" value="20"> Needle (20 Tk)
+                    </label>
+                    <br>
+                    <label>
+                        <input type="checkbox" id="additionalCheckbox2" value="20"> Red Tube (20 Tk)
+                    </label>
+                    <br>
+                    <label>
+                        Others:
+                        <input class="form-control" type="text" id="additionalInput" value="0">
+                    </label>
+                </div>
 
 
 
@@ -328,6 +348,8 @@
                 $('#couponDiscount').val(discountAmount.toFixed(2));
                 $('#pdf_couponDiscount').val(discountAmount.toFixed(2));
                 $('#applyPromoCode').prop('disabled', true);
+
+                calculateTotalPrice();
 
                 // Show the remove button and attach a click handler
                 $('#removePromoCode').show().click(function() {
@@ -437,7 +459,6 @@
                 $('#clinicAccount').val(clinicAccount.toFixed(2)); // Update clinic account value
             }
 
-            // Calculate total price
             function calculateTotalPrice() {
                 var totalFee = 0;
                 var totalPatientDiscount = 0;
@@ -461,7 +482,7 @@
                     if ($(this).data('type') === 'package') {
                         // Package discount distribution
                         if ($('#givePatientDiscount').is(':checked')) patientDiscount = discountAmount *
-                        0.5;
+                            0.5;
                         if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount *
                             0.25;
                         if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount *
@@ -472,7 +493,7 @@
                         if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount /
                             3;
                         if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount /
-                        3;
+                            3;
                     }
 
                     var patientPayment = discountedFee;
@@ -497,14 +518,34 @@
                 var discountAmount = couponAmount ? parseFloat(couponAmount) : 0;
                 totalPatientPayment -= discountAmount;
 
+                // Add additional checkbox and input box values
+                var additionalFee = $('#additionalCheckbox').is(':checked') ? parseFloat($('#additionalCheckbox')
+                    .val()) : 0;
+                var additionalFee2 = $('#additionalCheckbox2').is(':checked') ? parseFloat($('#additionalCheckbox2')
+                    .val()) : 0;
+                var additionalInputValue = parseFloat($('#additionalInput').val());
+                if (isNaN(additionalInputValue)) {
+                    additionalInputValue = 0;
+                }
+
                 var totalVAT = totalPatientPayment * 0.15;
                 var finalTotalPrice = totalPatientPayment + totalVAT;
+
+                finalTotalPrice += additionalFee + additionalFee2 + additionalInputValue;
 
                 $('#totalPrice').val(totalPatientPayment.toFixed(2));
                 $('#totalVat').val(totalVAT.toFixed(2));
                 $('#finalPrice').val(finalTotalPrice.toFixed(2));
                 $('#clinicAccount').val(clinicAccount.toFixed(2)); // Update clinic account value
             }
+
+            // Bind change events to update the total price in real-time
+            $('#additionalCheckbox, #additionalCheckbox2, #additionalInput, #couponDiscount').on('change keyup',
+                calculateTotalPrice);
+            $('#selectedItems2').on('change keyup', 'input', calculateTotalPrice);
+
+            // Initial calculation
+            calculateTotalPrice();
 
             // Recalculate total price when discount input changes
             $(document).on('input', '.discountInput', function() {
@@ -535,6 +576,15 @@
                     reference: $('#reference').val(),
                     doctorName: $('#doctorName').val(),
                     doctorRoom: $('#doctorRoom').val(),
+
+                    additionalCheckbox: $('#additionalCheckbox').is(':checked') ? parseFloat($(
+                            '#additionalCheckbox')
+                        .val()) : 0,
+                    additionalCheckbox2: $('#additionalCheckbox2').is(':checked') ? parseFloat($(
+                            '#additionalCheckbox2')
+                        .val()) : 0,
+                    additionalInput: $('#additionalInput').val(),
+
                     items: []
                 };
 
@@ -604,6 +654,12 @@
                     doctorName: $('#doctorName').val(),
                     doctorRoom: $('#doctorRoom').val(),
 
+                    additionalCheckbox: $('#additionalCheckbox').is(':checked') ? parseFloat($('#additionalCheckbox')
+                    .val()) : 0,
+                    additionalCheckbox2: $('#additionalCheckbox2').is(':checked') ? parseFloat($('#additionalCheckbox2')
+                    .val()) : 0,
+                    additionalInput: $('#additionalInput').val(),
+
                     totalPrice: $('#totalPrice').val(),
                     totalVat: $('#totalVat').val(),
                     finalPrice: $('#finalPrice').val(),
@@ -643,6 +699,10 @@
                 $('#pdf_totalVat').val(formData.totalVat);
                 $('#pdf_finalPrice').val(formData.finalPrice);
                 $('#pdf_items').val(JSON.stringify(formData.items));
+
+                $('#pdf_additionalCheckbox').val(formData.additionalCheckbox);
+                $('#pdf_additionalCheckbox2').val(formData.additionalCheckbox2);
+                $('#pdf_additionalInput').val(formData.additionalInput);
             }
 
 

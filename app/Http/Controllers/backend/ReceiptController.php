@@ -49,6 +49,24 @@ class ReceiptController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at->format('h:i A | d M, Y');
                 })
+                ->addColumn('item', function ($row) {
+                    $item = '';
+
+                    if ($row->needle > 0) {
+                        $needle = '<div>Needle: '. $row->needle .'</div>';  
+                        $item .= $needle;               
+                    } 
+                    if ($row->red_tube > 0) {
+                        $red_tube = '<div>Red Tube: '. $row->red_tube .'</div>';
+                        $item .= $red_tube;
+                    } 
+                    if ($row->others > 0) {
+                        $others = '<div>Others: '. $row->others .'</div>';
+                        $item .= $others;
+                    } 
+                     
+                    return $item;
+                })
                 ->addColumn('action', function ($row) {
                     $actionBtn = '';
                     $actionBtn .= '<a href="' . route('print', $row->id) . '" target="_blank" class="btn btn-success btn-xs mr-1">Print</a>';
@@ -56,7 +74,7 @@ class ReceiptController extends Controller
 
                     return $actionBtn;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['item','action'])
                 ->make(true);
         }
     }
@@ -97,8 +115,13 @@ class ReceiptController extends Controller
         $receipt->patient_type = $request->input('patientType');
         $receipt->patient_gender = $request->input('patientGender');
 
-        $receipt->doctor_name = $request->input('doctorName');
+        $receipt->reference = $request->input('reference');
         $receipt->doctor_room = $request->input('doctorRoom');
+        $receipt->doctor_room = $request->input('doctorRoom');
+
+        $receipt->needle = $request->input('additionalCheckbox');
+        $receipt->red_tube = $request->input('additionalCheckbox2');
+        $receipt->others = $request->input('additionalInput');
 
         $receipt->total_price = $request->input('totalPrice');
         $receipt->total_vat = $request->input('totalVat');
