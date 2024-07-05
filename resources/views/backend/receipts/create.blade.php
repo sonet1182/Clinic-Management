@@ -144,12 +144,15 @@
             <div class="card-body">
 
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
+                        <label for="staticEmail" class="col-form-label">Reference:</label>
+                        <input type="text" class="form-control" id="reference" placeholder="" value="">
+                    </div>
+                    <div class="form-group col-md-4">
                         <label for="staticEmail" class="col-form-label">Reference Doctor Name:</label>
                         <input type="text" class="form-control" id="doctorName" placeholder="" value="">
-
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="staticEmail" class="col-form-label">Room No:</label>
                         <input type="text" class="form-control" id="doctorRoom" placeholder="" value="">
                     </div>
@@ -207,6 +210,7 @@
                     <input type="hidden" name="pdf_patientPhone" id="pdf_patientPhone" value="">
                     <input type="hidden" name="pdf_patientGender" id="pdf_patientGender" value="">
                     <input type="hidden" name="pdf_patientType" id="pdf_patientType" value="">
+                    <input type="hidden" name="pdf_reference" id="pdf_reference" value="">
                     <input type="hidden" name="pdf_doctorName" id="pdf_doctorName" value="">
                     <input type="hidden" name="pdf_doctorRoom" id="pdf_doctorRoom" value="">
                     <input type="hidden" name="pdf_totalPrice" id="pdf_totalPrice" value="">
@@ -307,17 +311,20 @@
 
             function applyPromoCodeDiscount(promoCode) {
                 var discountAmount = 0;
-                var totalFeeWithVAT = parseFloat($('#finalPrice').val());
+                var totalPrice = parseFloat($('#totalPrice').val());
 
                 if (promoCode.type == 1) {
-                    discountAmount = totalFeeWithVAT * (promoCode.amount / 100);
+                    discountAmount = totalPrice * (promoCode.amount / 100);
                 } else if (promoCode.type == 2) {
                     discountAmount = promoCode.amount;
                 }
 
-                var finalPriceAfterDiscount = totalFeeWithVAT - discountAmount;
+                var priceAfterDiscount = totalPrice - discountAmount;
+                var totalVat = priceAfterDiscount * 15 / 100;
+                var finalPrice = priceAfterDiscount + totalVat;
 
-                $('#finalPrice').val(finalPriceAfterDiscount.toFixed(2));
+                $('#finalPrice').val(finalPrice.toFixed(2));
+                $('#totalVat').val(totalVat.toFixed(2));
                 $('#couponDiscount').val(discountAmount.toFixed(2));
                 $('#pdf_couponDiscount').val(discountAmount.toFixed(2));
                 $('#applyPromoCode').prop('disabled', true);
@@ -325,7 +332,7 @@
                 // Show the remove button and attach a click handler
                 $('#removePromoCode').show().click(function() {
                     // Reset UI elements to their initial state
-                    $('#finalPrice').val(totalFeeWithVAT.toFixed(2)); // Restore final price
+                    $('#totalPrice').val(totalPrice.toFixed(2)); // Restore final price
                     $('#promoCode').val('0.00'); // Reset coupon discount input
                     $('#couponDiscount').val('0.00'); // Reset coupon discount input
                     $('#pdf_couponDiscount').val('0.00'); // Reset another coupon discount input
@@ -345,6 +352,7 @@
                 $('#giveReferenceDiscount').prop('checked', false);
                 $('#giveDoctorCommission').prop('checked', false);
 
+                $('#reference').val('');
                 $('#doctorName').val('');
                 $('#doctorRoom').val('');
 
@@ -361,7 +369,7 @@
             }
 
             // Calculate total price
-            function calculateTotalPrice() {
+            function calculateTotalPrice2() {
                 var totalFee = 0;
                 var totalPatientDiscount = 0;
                 var totalReferenceDiscount = 0;
@@ -429,6 +437,75 @@
                 $('#clinicAccount').val(clinicAccount.toFixed(2)); // Update clinic account value
             }
 
+            // Calculate total price
+            function calculateTotalPrice() {
+                var totalFee = 0;
+                var totalPatientDiscount = 0;
+                var totalReferenceDiscount = 0;
+                var totalDoctorCommission = 0;
+                var totalPatientPayment = 0;
+                var clinicAccount = 0; // Initialize clinic account variable
+
+                $('#selectedItems2 tr').each(function() {
+                    var fee = parseFloat($(this).find('td:eq(1)').text());
+                    totalFee += fee;
+
+                    var discountPercentage = parseFloat($(this).find('td:eq(2) input').val());
+                    var discountAmount = fee * (discountPercentage / 100);
+                    var discountedFee = fee - discountAmount;
+
+                    var patientDiscount = 0,
+                        referenceDiscount = 0,
+                        doctorCommission = 0;
+
+                    if ($(this).data('type') === 'package') {
+                        // Package discount distribution
+                        if ($('#givePatientDiscount').is(':checked')) patientDiscount = discountAmount *
+                        0.5;
+                        if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount *
+                            0.25;
+                        if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount *
+                            0.25;
+                    } else {
+                        // Test discount distribution
+                        if ($('#givePatientDiscount').is(':checked')) patientDiscount = discountAmount / 3;
+                        if ($('#giveReferenceDiscount').is(':checked')) referenceDiscount = discountAmount /
+                            3;
+                        if ($('#giveDoctorCommission').is(':checked')) doctorCommission = discountAmount /
+                        3;
+                    }
+
+                    var patientPayment = discountedFee;
+
+                    totalPatientDiscount += patientDiscount;
+                    totalReferenceDiscount += referenceDiscount;
+                    totalDoctorCommission += doctorCommission;
+                    totalPatientPayment += patientPayment;
+
+                    // Add undistributed discount to clinic account
+                    clinicAccount += discountAmount - (patientDiscount + referenceDiscount +
+                        doctorCommission);
+
+                    $(this).find('td:eq(3)').text(patientDiscount.toFixed(2) + ' Tk');
+                    $(this).find('td:eq(4)').text(referenceDiscount.toFixed(2) + ' Tk');
+                    $(this).find('td:eq(5)').text(doctorCommission.toFixed(2) + ' Tk');
+                    $(this).find('td:eq(6)').text(patientPayment.toFixed(2) + ' Tk');
+                });
+
+                // Apply promo code discount
+                var couponAmount = $('#couponDiscount').val();
+                var discountAmount = couponAmount ? parseFloat(couponAmount) : 0;
+                totalPatientPayment -= discountAmount;
+
+                var totalVAT = totalPatientPayment * 0.15;
+                var finalTotalPrice = totalPatientPayment + totalVAT;
+
+                $('#totalPrice').val(totalPatientPayment.toFixed(2));
+                $('#totalVat').val(totalVAT.toFixed(2));
+                $('#finalPrice').val(finalTotalPrice.toFixed(2));
+                $('#clinicAccount').val(clinicAccount.toFixed(2)); // Update clinic account value
+            }
+
             // Recalculate total price when discount input changes
             $(document).on('input', '.discountInput', function() {
                 calculateTotalPrice();
@@ -455,6 +532,7 @@
                     couponDiscount: $('#couponDiscount').val(),
                     clinicAccount: $('#clinicAccount').val(),
                     finalPrice: $('#finalPrice').val(),
+                    reference: $('#reference').val(),
                     doctorName: $('#doctorName').val(),
                     doctorRoom: $('#doctorRoom').val(),
                     items: []
@@ -522,6 +600,7 @@
                     patientType: $('#patientType').val(),
                     patientGender: $('#patientGender').val(),
 
+                    reference: $('#reference').val(),
                     doctorName: $('#doctorName').val(),
                     doctorRoom: $('#doctorRoom').val(),
 
@@ -557,6 +636,7 @@
                 $('#pdf_patientPhone').val(formData.patientPhone);
                 $('#pdf_patientType').val(formData.patientType);
                 $('#pdf_patientGender').val(formData.patientGender);
+                $('#pdf_reference').val(formData.reference);
                 $('#pdf_doctorName').val(formData.doctorName);
                 $('#pdf_doctorRoom').val(formData.doctorRoom);
                 $('#pdf_totalPrice').val(formData.totalPrice);
